@@ -287,7 +287,7 @@ const update = () => {
   if (dogWidth <= 0) dogWidth = 0;
   if (dogWidth >= canvas.width / 2 - 50) dogWidth = canvas.width / 2 - 50;
   if (dogHeight <= 0) dogHeight = 0;
-  if (dogHeight <= canvas.height - 50) dogHeight = canvas.height / 2 - 50;
+  if (dogHeight >= canvas.height - 50) dogHeight = canvas.height - 50;
   if (ballCollisionWithDog()) {
     ballSpeedX = Math.random() < 0.5 ? -2 : 2;
     ballSpeedY = Math.random() < 0.5 ? -2 : 2;
