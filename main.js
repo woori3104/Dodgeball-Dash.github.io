@@ -141,7 +141,54 @@ const render = () => {
 };
 
 const keyDown = {};
+// 터치패드 화살표 관련 변수
+let touchArrow = {
+  up: false,
+  down: false,
+  left: false,
+  right: false,
+};
 
+const touchPadCanvas = document.createElement("canvas");
+const touchPadCtx = touchPadCanvas.getContext("2d");
+touchPadCanvas.width = 200;
+touchPadCanvas.height = 200;
+touchPadCanvas.style.position = "absolute";
+touchPadCanvas.style.bottom = "20px";
+touchPadCanvas.style.left = "20px";
+document.body.appendChild(touchPadCanvas);
+
+// 터치패드 스타일 설정
+touchPadCtx.fillStyle = "rgba(255, 255, 255, 0.5)";
+touchPadCtx.fillRect(0, 0, touchPadCanvas.width, touchPadCanvas.height);
+touchPadCtx.strokeStyle = "black";
+touchPadCtx.lineWidth = 2;
+touchPadCtx.strokeRect(0, 0, touchPadCanvas.width, touchPadCanvas.height);
+
+// 터치패드 이벤트 처리
+const handleTouchPad = (e) => {
+  const rect = touchPadCanvas.getBoundingClientRect();
+  const touchX = e.clientX - rect.left;
+  const touchY = e.clientY - rect.top;
+
+  // 터치패드 영역 내에서 화살표 이벤트 처리
+  if (
+    touchX > 0 &&
+    touchX < touchPadCanvas.width &&
+    touchY > 0 &&
+    touchY < touchPadCanvas.height
+  ) {
+    touchArrow.up = touchY < touchPadCanvas.height / 3;
+    touchArrow.down = touchY > (touchPadCanvas.height / 3) * 2;
+    touchArrow.left = touchX < touchPadCanvas.width / 3;
+    touchArrow.right = touchX > (touchPadCanvas.width / 3) * 2;
+  }
+};
+
+// 터치패드 화살표 이벤트 처리
+const handleTouchArrow = (arrow, value) => {
+  touchArrow[arrow] = value;
+};
 const setupKeyboard = () => {
   document.addEventListener("keydown", function (e) {
     keyDown[e.keyCode] = true;
@@ -153,6 +200,21 @@ const setupKeyboard = () => {
   });
   document.addEventListener("keyup", function (e) {
     delete keyDown[e.keyCode];
+  });
+
+  // 터치패드 이벤트 리스너 등록
+  touchPadCanvas.addEventListener("mousedown", (e) => {
+    handleTouchPad(e);
+    touchPadCanvas.addEventListener("mousemove", handleTouchPad);
+  });
+
+  // 터치패드 이벤트 리스너 해제
+  touchPadCanvas.addEventListener("mouseup", () => {
+    touchPadCanvas.removeEventListener("mousemove", handleTouchPad);
+    touchArrow.up = false;
+    touchArrow.down = false;
+    touchArrow.left = false;
+    touchArrow.right = false;
   });
 };
 
@@ -182,12 +244,21 @@ const ballCollisionWithCat = () => {
   }
 };
 
+// 화살표 이동에 따른 개체 위치 업데이트
+const updatePosition = () => {
+  if (touchArrow.up && dogHeight > 0) dogHeight -= 5;
+  if (touchArrow.down && dogHeight < canvas.height - 100) dogHeight += 5;
+  if (touchArrow.left && dogWidth > 0) dogWidth -= 5;
+  if (touchArrow.right && dogWidth < canvas.width / 2 - 100) dogWidth += 5;
+};
+
+
 const update = () => {
   if (39 in keyDown) dogWidth += 5; // 오른쪽 방향키
   if (37 in keyDown) dogWidth -= 5; // 왼쪽 방향키
   if (38 in keyDown) dogHeight -= 5; // 위쪽 방향키
   if (40 in keyDown) dogHeight += 5; // 아래쪽 방향키
-
+  updatePosition()
   if (dogWidth <= 0) dogWidth = 0;
   if (dogWidth >= canvas.width / 2 - 50) dogWidth = canvas.width / 2 - 50;
   if (dogHeight <= 0) dogHeight = 0;
@@ -256,7 +327,7 @@ const catMovement = () => {
 
   const distance = Math.sqrt(dx * dx + dy * dy);
   // 고양이의 속도를 약간 줄여서 공을 덜 잘 칠 수 있게 합니다.
-  const speed = Math.min(distance, difficulty+1);
+  const speed = Math.min(distance, difficulty + 1);
 
   const vx = (speed * dx) / distance;
   const vy = (speed * dy) / distance;
