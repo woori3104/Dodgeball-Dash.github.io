@@ -15,14 +15,16 @@ const loadImage = () => {
   background.src = "images/background.png";
 };
 
-let dogWidth = 100;
-let dogHeight = 450;
+let dogWidth = canvas.width * 0.1;
+let dogHeight = canvas.height * 0.7;
 let isStart = false;
 
-let ballX = 120;
-let ballY = 270;
-let catX = 800;
-let catY = 450;
+let ballX = canvas.width * 0.4;
+let ballY = canvas.height * 0.4;
+let catX = canvas.width * 0.8;
+let catY = canvas.height * 0.7;
+let ballSize = canvas.width * 0.1;
+let animalSize = canvas.width * 0.3;
 
 let catSpeedX = 0;
 let catSpeedY = 0;
@@ -127,9 +129,9 @@ const render = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-  ctx.drawImage(ball, ballX, ballY, 40, 40);
-  ctx.drawImage(dog, dogWidth, dogHeight, 100, 100);
-  ctx.drawImage(cat, catX, catY, 100, 100);
+  ctx.drawImage(ball, ballX, ballY, ballSize, ballSize);
+  ctx.drawImage(dog, dogWidth, dogHeight, animalSize, animalSize);
+  ctx.drawImage(cat, catX, catY, animalSize, animalSize);
 
   ctx.fillStyle = "black";
   ctx.font = "20px Arial";
@@ -252,13 +254,12 @@ const updatePosition = () => {
   if (touchArrow.right && dogWidth < canvas.width / 2 - 100) dogWidth += 5;
 };
 
-
 const update = () => {
   if (39 in keyDown) dogWidth += 5; // 오른쪽 방향키
   if (37 in keyDown) dogWidth -= 5; // 왼쪽 방향키
   if (38 in keyDown) dogHeight -= 5; // 위쪽 방향키
   if (40 in keyDown) dogHeight += 5; // 아래쪽 방향키
-  updatePosition()
+  updatePosition();
   if (dogWidth <= 0) dogWidth = 0;
   if (dogWidth >= canvas.width / 2 - 50) dogWidth = canvas.width / 2 - 50;
   if (dogHeight <= 0) dogHeight = 0;
@@ -378,19 +379,55 @@ const ballCollisionWithDog = () => {
 };
 
 const resetPositions = () => {
-  ballX = 120;
-  ballY = 270;
-  dogWidth = 100;
-  dogHeight = 500;
-  catX = 700;
-  catY = 500;
+  dogWidth = canvas.width * 0.1;
+  dogHeight = canvas.height * 0.8;
+  isStart = false;
+
+  ballX = canvas.width * 0.4;
+  ballY = canvas.height * 0.5;
+  catX = canvas.width * 0.8;
+  catY = canvas.height * 0.8;
+
   catSpeedX = 0;
   catSpeedY = 0;
   isStart = false;
   ballSpeedX = 0;
   ballSpeedY = 0;
 };
+// 캔버스 크기 조정 함수
+const resizeCanvas = () => {
+  const browserWidth = window.innerWidth;
+  const browserHeight = window.innerHeight;
 
+  // 캔버스 너비와 높이 비율을 유지하며 가로 크기에 맞춰 조정
+  const canvasAspectRatio = canvas.width / canvas.height;
+  const targetWidth = browserWidth;
+  const targetHeight = browserWidth / canvasAspectRatio;
+
+  // 캔버스 스타일 크기 조정
+  canvas.style.width = `${targetWidth}px`;
+  canvas.style.height = `${targetHeight}px`;
+
+  // 캔버스 실제 픽셀 크기 조정
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+
+  dogWidth = canvas.width * 0.1;
+  dogHeight = canvas.height * 0.8;
+  ballX = canvas.width * 0.4;
+  ballY = canvas.height * 0.4;
+  catX = canvas.width * 0.8;
+  catY = canvas.height *0.8;
+
+  ballSize = canvas.width * 0.04;
+  animalSize = canvas.width * 0.1;
+};
+
+// 창 크기 변경 이벤트 리스너 등록
+window.addEventListener("resize", resizeCanvas);
+
+// 초기 캔버스 크기 설정
+resizeCanvas();
 const main = () => {
   if (!isPaused) {
     update();
