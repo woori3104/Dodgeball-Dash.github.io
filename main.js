@@ -218,6 +218,21 @@ const setupKeyboard = () => {
     touchArrow.left = false;
     touchArrow.right = false;
   });
+
+  // 터치패드 이벤트 리스너 등록
+  touchPadCanvas.addEventListener("touchstart", (e) => {
+    handleTouchPad(e);
+    touchPadCanvas.addEventListener("touchmove", handleTouchPad);
+  });
+
+  // 터치패드 이벤트 리스너 해제
+  touchPadCanvas.addEventListener("touchend", () => {
+    touchPadCanvas.removeEventListener("touchmove", handleTouchPad);
+    touchArrow.up = false;
+    touchArrow.down = false;
+    touchArrow.left = false;
+    touchArrow.right = false;
+  });
 };
 
 let ballSpeedX = 0;
@@ -417,7 +432,7 @@ const resizeCanvas = () => {
   ballX = canvas.width * 0.4;
   ballY = canvas.height * 0.4;
   catX = canvas.width * 0.8;
-  catY = canvas.height *0.8;
+  catY = canvas.height * 0.8;
 
   ballSize = canvas.width * 0.04;
   animalSize = canvas.width * 0.1;
