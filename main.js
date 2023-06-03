@@ -1,19 +1,12 @@
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
+
+let restartButton = document.getElementById("restart");
+let difficultyButton = document.getElementById("difficulty");
+
 canvas.width = 1000;
 canvas.height = 600;
 document.body.appendChild(canvas);
-
-const loadImage = () => {
-  ball = new Image();
-  ball.src = "images/ball.png";
-  cat = new Image();
-  cat.src = "images/cat.png";
-  dog = new Image();
-  dog.src = "images/dog.png";
-  background = new Image();
-  background.src = "images/background.png";
-};
 
 let dogWidth = canvas.width * 0.1;
 let dogHeight = canvas.height * 0.7;
@@ -28,17 +21,29 @@ let animalSize = canvas.width * 0.3;
 
 let catSpeedX = 0;
 let catSpeedY = 0;
-
 let dogScore = 0;
 let catScore = 0;
-// HTML에 미리 재시작과 난이도 변경 버튼을 추가해놓고 필요할 때만 표시되도록 합니다.
-let restartButton = document.getElementById("restart");
-let difficultyButton = document.getElementById("difficulty");
 
-// 캔버스에 그려질 난이도 표시와 게임 중단 버튼 관련 코드를 추가합니다.
-let isPaused = false; // 게임 중단 상태인지를 확인하는 플래그입니다.
+let isPaused = false;
 let difficulty = 1;
-// 난이도를 캔버스 상단에 표시합니다.
+
+/**
+ * Image Load
+ */
+const loadImage = () => {
+  ball = new Image();
+  ball.src = "images/ball.png";
+  cat = new Image();
+  cat.src = "images/cat.png";
+  dog = new Image();
+  dog.src = "images/dog.png";
+  background = new Image();
+  background.src = "images/background.png";
+};
+
+/**
+ * 난이도표시
+ */
 const drawDifficulty = () => {
   ctx.fillStyle = "black";
   ctx.font = "20px Arial";
@@ -49,7 +54,9 @@ const drawDifficulty = () => {
   );
 };
 
-// 게임 중단 버튼을 캔버스 하단에 표시합니다.
+/**
+ * 게암중단버튼
+ */
 const drawPauseButton = () => {
   if (!isPaused) {
     ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
@@ -65,6 +72,7 @@ const drawPauseButton = () => {
     ctx.fillText("Click here to start", 10, canvas.height - 10);
   }
 };
+
 const drawRestartButton = () => {
   // 초기에는 버튼들을 숨겨놓습니다.
   restartButton.style.display = "none";
@@ -80,46 +88,44 @@ const drawRestartButton = () => {
   difficultyButton.style.right = "10px";
 };
 
+const setStyle = (style) => {
+  restartButton.style.display = style;
+  difficultyButton.style.display = style;
+};
+
 const onClickEvent = () => {
   canvas.addEventListener("click", function (e) {
-    // 마우스 포인터의 y 좌표를 가져옵니다.
+    // 마우스 포인터의 y 좌표
     let mouseY = e.clientY - canvas.getBoundingClientRect().top;
 
-    // 사용자가 canvas의 하단을 클릭한 경우 게임을 일시 중지합니다.
+    // 사용자가 canvas의 하단을 클릭한 경우 게임을 일시 중지
     if (mouseY > canvas.height - 40) {
       isPaused = !isPaused;
-      if (isPaused) {
-        restartButton.style.display = "block";
-        difficultyButton.style.display = "block";
-      } else {
-        restartButton.style.display = "none";
-        difficultyButton.style.display = "none";
-      }
+      isPaused ? setStyle("black") : setStyle("none");
     }
   });
 
-  // 버튼을 클릭하면 게임을 재시작하거나 난이도를 변경하는 로직을 추가합니다.
+  // 버튼을 클릭하면 게임을 재시작하거나 난이도를 변경
   restartButton.addEventListener("click", function () {
-    // 점수를 0으로 초기화합니다.
+    // 점수를 0으로 초기화
     dogScore = 0;
     catScore = 0;
 
-    // 공과 플레이어의 위치를 초기화합니다.
+    // 공과 플레이어의 위치를 초기화
     resetPositions();
 
     // 게임 일시 중지 상태를 해제합니다.
     isPaused = false;
 
     // 버튼들을 다시 숨깁니다.
-    restartButton.style.display = "none";
-    difficultyButton.style.display = "none";
+    setStyle("none");
   });
 
   difficultyButton.addEventListener("click", function () {
-    // 난이도를 변경합니다. 이 경우에는 난이도가 3단계라고 가정하겠습니다.
+    // 난이도를 변경합니다.
     difficulty = (difficulty % 3) + 1;
 
-    // 버튼의 텍스트를 업데이트하여 현재 난이도를 표시합니다.
+    // 버튼의 텍스트를 업데이트하여 현재 난이도를 표시
     difficultyButton.textContent =
       "Difficulty: " + ["Easy", "Medium", "Hard"][difficulty - 1];
   });
@@ -127,7 +133,6 @@ const onClickEvent = () => {
 
 const render = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
   ctx.drawImage(ball, ballX, ballY, ballSize, ballSize);
   ctx.drawImage(dog, dogWidth, dogHeight, animalSize, animalSize);
@@ -137,9 +142,6 @@ const render = () => {
   ctx.font = "20px Arial";
   ctx.fillText("Dog: " + dogScore, 10, 30);
   ctx.fillText("Cat: " + catScore, canvas.width - 80, 30);
-  drawDifficulty();
-  drawPauseButton();
-  drawRestartButton();
 };
 
 const keyDown = {};
@@ -153,8 +155,8 @@ let touchArrow = {
 
 const touchPadCanvas = document.createElement("canvas");
 const touchPadCtx = touchPadCanvas.getContext("2d");
-touchPadCanvas.width = canvas.width*0.4;
-touchPadCanvas.height = canvas.width*0.4;
+touchPadCanvas.width = 300;
+touchPadCanvas.height = 300;
 touchPadCanvas.style.position = "absolute";
 touchPadCanvas.style.bottom = "20px";
 touchPadCanvas.style.left = "20px";
@@ -167,22 +169,21 @@ touchPadCtx.strokeStyle = "black";
 touchPadCtx.lineWidth = 2;
 touchPadCtx.strokeRect(0, 0, touchPadCanvas.width, touchPadCanvas.height);
 
+const setTouchXY = (x, y) => {
+  const rect = touchPadCanvas.getBoundingClientRect();
+  //let touchX, touchY;
+  const touchX = x - rect.left;
+  const touchY = y - rect.top;
+  return {touchX, touchY}
+};
+
 // 터치패드 이벤트 처리
 const handleTouchPad = (e) => {
-  const rect = touchPadCanvas.getBoundingClientRect();
-  let touchX, touchY;
+ 
+  const {touchX, touchY} = e.touches
+    ? setTouchXY(e.changedTouches[0].clientX, e.changedTouches[0].clientY)
+    : setTouchXY(e.clientX, e.clientY);
 
-  // 터치 이벤트인 경우
-  if (e.touches) {
-    console.log({e})
-    touchX = e.changedTouches[0].clientX - rect.left;
-    touchY = e.changedTouches[0].clientY - rect.top;
-  }
-  // 마우스 클릭 이벤트인 경우
-  else {
-    touchX = e.clientX - rect.left;
-    touchY = e.clientY - rect.top;
-  }
   // 터치패드 영역 내에서 화살표 이벤트 처리
   if (
     touchX > 0 &&
@@ -201,6 +202,26 @@ const handleTouchPad = (e) => {
 const handleTouchArrow = (arrow, value) => {
   touchArrow[arrow] = value;
 };
+
+const handleEventEnd = () => {
+  touchPadCanvas.removeEventListener("mousemove", handleTouchPad);
+  touchPadCanvas.removeEventListener("touchmove", handleTouchPad);
+  touchArrow.up = false;
+  touchArrow.down = false;
+  touchArrow.left = false;
+  touchArrow.right = false;
+};
+
+const handleEventStart = (e) => {
+  handleTouchPad(e);
+  isStart = true;
+  if (e.type === "mousedown") {
+    touchPadCanvas.addEventListener("mousemove", handleTouchPad);
+  } else if (e.type === "touchstart") {
+    touchPadCanvas.addEventListener("touchmove", handleTouchPad);
+  }
+};
+
 const setupKeyboard = () => {
   document.addEventListener("keydown", function (e) {
     keyDown[e.keyCode] = true;
@@ -214,36 +235,16 @@ const setupKeyboard = () => {
     delete keyDown[e.keyCode];
   });
 
-  // 터치패드 이벤트 리스너 등록
-  touchPadCanvas.addEventListener("mousedown", (e) => {
-    isStart=true
-    handleTouchPad(e);
-    touchPadCanvas.addEventListener("mousemove", handleTouchPad);
-  });
+  const handleMouseUp = handleEventEnd;
+  const handleTouchEnd = handleEventEnd;
 
-  // 터치패드 이벤트 리스너 해제
-  touchPadCanvas.addEventListener("mouseup", () => {
-    touchPadCanvas.removeEventListener("mousemove", handleTouchPad);
-    touchArrow.up = false;
-    touchArrow.down = false;
-    touchArrow.left = false;
-    touchArrow.right = false;
-  });
+  const handleMouseDown = handleEventStart;
+  const handleTouchStart = handleEventStart;
 
-  touchPadCanvas.addEventListener("touchstart", (e) => {
-    handleTouchPad(e);
-    isStart=true
-    touchPadCanvas.addEventListener("touchmove", handleTouchPad);
-  });
-
-  // 터치패드 이벤트 리스너 해제
-  touchPadCanvas.addEventListener("touchend", () => {
-    touchPadCanvas.removeEventListener("touchmove", handleTouchPad);
-    touchArrow.up = false;
-    touchArrow.down = false;
-    touchArrow.left = false;
-    touchArrow.right = false;
-  });
+  touchPadCanvas.addEventListener("mousedown", handleMouseDown);
+  touchPadCanvas.addEventListener("mouseup", handleMouseUp);
+  touchPadCanvas.addEventListener("touchstart", handleTouchStart);
+  touchPadCanvas.addEventListener("touchend", handleTouchEnd);
 };
 
 let ballSpeedX = 0;
@@ -297,11 +298,10 @@ const updatePosition = () => {
   if (touchArrow.up && dogHeight > 0) dogHeight -= 5;
   if (touchArrow.down && dogHeight < canvas.height - 100) dogHeight += 5;
   if (touchArrow.left && dogWidth > 0) dogWidth -= 5;
-  if (touchArrow.right && dogWidth < canvas.width / 2 ) dogWidth += 5;
+  if (touchArrow.right && dogWidth < canvas.width / 2) dogWidth += 5;
 };
 
 const update = () => {
-
   if (39 in keyDown) dogWidth += 5; // 오른쪽 방향키
   if (37 in keyDown) dogWidth -= 5; // 왼쪽 방향키
   if (38 in keyDown) dogHeight -= 5; // 위쪽 방향키
@@ -312,7 +312,6 @@ const update = () => {
   if (dogHeight <= 0) dogHeight = 0;
   if (dogHeight >= canvas.height - 50) dogHeight = canvas.height - 50;
   if (ballCollisionWithDog()) {
-
     ballSpeedX = Math.random() < 0.5 ? -2 : 2;
     ballSpeedY = Math.random() < 0.5 ? -2 : 2;
 
@@ -327,9 +326,6 @@ const update = () => {
 
     ballSpeedX = Math.sign(deltaX) * Math.abs(ballSpeedX);
     ballSpeedY = Math.sign(deltaY) * Math.abs(ballSpeedY);
-
-
-
   }
 
   if (ballCollisionWithCat()) {
@@ -347,8 +343,6 @@ const update = () => {
 
     ballSpeedX = Math.sign(deltaX) * Math.abs(ballSpeedX);
     ballSpeedY = Math.sign(deltaY) * Math.abs(ballSpeedY);
-
-
   }
   catMovement();
 
