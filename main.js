@@ -216,6 +216,7 @@ const setupKeyboard = () => {
 
   // 터치패드 이벤트 리스너 등록
   touchPadCanvas.addEventListener("mousedown", (e) => {
+    isStart=true
     handleTouchPad(e);
     touchPadCanvas.addEventListener("mousemove", handleTouchPad);
   });
