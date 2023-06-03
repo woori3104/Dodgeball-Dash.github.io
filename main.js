@@ -173,14 +173,15 @@ const handleTouchPad = (e) => {
   let touchX, touchY;
 
   // 터치 이벤트인 경우
-  if (event.touches) {
-    touchX = event.changedTouches[0].clientX - rect.left;
-    touchY = event.changedTouches[0].clientY - rect.top;
+  if (e.touches) {
+    console.log({e})
+    touchX = e.changedTouches[0].clientX - rect.left;
+    touchY = e.changedTouches[0].clientY - rect.top;
   }
   // 마우스 클릭 이벤트인 경우
   else {
-    touchX = event.clientX - rect.left;
-    touchY = event.clientY - rect.top;
+    touchX = e.clientX - rect.left;
+    touchY = e.clientY - rect.top;
   }
   // 터치패드 영역 내에서 화살표 이벤트 처리
   if (
