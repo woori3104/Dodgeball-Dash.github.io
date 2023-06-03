@@ -19,11 +19,11 @@ let dogWidth = canvas.width * 0.1;
 let dogHeight = canvas.height * 0.7;
 let isStart = false;
 
-let ballX = canvas.width * 0.4;
-let ballY = canvas.height * 0.4;
+let ballX = canvas.width * 0.3;
+let ballY = canvas.height * 0.5;
 let catX = canvas.width * 0.8;
 let catY = canvas.height * 0.7;
-let ballSize = canvas.width * 0.1;
+let ballSize = canvas.width * 0.2;
 let animalSize = canvas.width * 0.3;
 
 let catSpeedX = 0;
@@ -153,8 +153,8 @@ let touchArrow = {
 
 const touchPadCanvas = document.createElement("canvas");
 const touchPadCtx = touchPadCanvas.getContext("2d");
-touchPadCanvas.width = 200;
-touchPadCanvas.height = 200;
+touchPadCanvas.width = canvas.width*0.4;
+touchPadCanvas.height = canvas.width*0.4;
 touchPadCanvas.style.position = "absolute";
 touchPadCanvas.style.bottom = "20px";
 touchPadCanvas.style.left = "20px";
@@ -251,14 +251,14 @@ let ballSpeedY = 0;
 
 const ballCollisionWithCat = () => {
   const catLeft = catX;
-  const catRight = catX + 80;
+  const catRight = catX + animalSize;
   const catTop = catY;
-  const catBottom = catY + 80;
+  const catBottom = catY + animalSize;
 
   const ballLeft = ballX;
-  const ballRight = ballX + 40;
+  const ballRight = ballX + ballSize;
   const ballTop = ballY;
-  const ballBottom = ballY + 40;
+  const ballBottom = ballY + ballSize;
 
   if (
     ballLeft < catRight &&
@@ -266,6 +266,26 @@ const ballCollisionWithCat = () => {
     ballTop < catBottom &&
     ballBottom > catTop
   ) {
+    // 충돌이 발생한 경우 엉덩이의 중심 위치를 계산합니다.
+    const catCenterX = catX + animalSize / 2;
+    const catCenterY = catY + animalSize / 2;
+
+    // 공의 중심 위치를 계산합니다.
+    const ballCenterX = ballX + ballSize / 2;
+    const ballCenterY = ballY + ballSize / 2;
+
+    // 엉덩이와 공의 상대적인 위치를 계산합니다.
+    const deltaX = ballCenterX - catCenterX;
+    const deltaY = ballCenterY - catCenterY;
+
+    // 공의 속도를 조정하여 엉덩이에서 튀어나가도록 합니다.
+    ballSpeedX = Math.sign(deltaX) * Math.abs(ballSpeedX);
+    ballSpeedY = Math.sign(deltaY) * Math.abs(ballSpeedY);
+
+    const randomFactor = 0.2; // 조절 가능한 랜덤 요소 크기
+    ballSpeedX += Math.random() * randomFactor - randomFactor / 2;
+    ballSpeedY += Math.random() * randomFactor - randomFactor / 2;
+
     return true; // 충돌 발생
   } else {
     return false; // 충돌 없음
@@ -277,10 +297,11 @@ const updatePosition = () => {
   if (touchArrow.up && dogHeight > 0) dogHeight -= 5;
   if (touchArrow.down && dogHeight < canvas.height - 100) dogHeight += 5;
   if (touchArrow.left && dogWidth > 0) dogWidth -= 5;
-  if (touchArrow.right && dogWidth < canvas.width / 2 - 100) dogWidth += 5;
+  if (touchArrow.right && dogWidth < canvas.width / 2 ) dogWidth += 5;
 };
 
 const update = () => {
+
   if (39 in keyDown) dogWidth += 5; // 오른쪽 방향키
   if (37 in keyDown) dogWidth -= 5; // 왼쪽 방향키
   if (38 in keyDown) dogHeight -= 5; // 위쪽 방향키
@@ -291,6 +312,7 @@ const update = () => {
   if (dogHeight <= 0) dogHeight = 0;
   if (dogHeight >= canvas.height - 50) dogHeight = canvas.height - 50;
   if (ballCollisionWithDog()) {
+
     ballSpeedX = Math.random() < 0.5 ? -2 : 2;
     ballSpeedY = Math.random() < 0.5 ? -2 : 2;
 
@@ -305,6 +327,9 @@ const update = () => {
 
     ballSpeedX = Math.sign(deltaX) * Math.abs(ballSpeedX);
     ballSpeedY = Math.sign(deltaY) * Math.abs(ballSpeedY);
+
+
+
   }
 
   if (ballCollisionWithCat()) {
@@ -322,6 +347,8 @@ const update = () => {
 
     ballSpeedX = Math.sign(deltaX) * Math.abs(ballSpeedX);
     ballSpeedY = Math.sign(deltaY) * Math.abs(ballSpeedY);
+
+
   }
   catMovement();
 
@@ -383,14 +410,14 @@ const catMovement = () => {
 
 const ballCollisionWithDog = () => {
   const dogLeft = dogWidth;
-  const dogRight = dogWidth + 80;
+  const dogRight = dogWidth + animalSize;
   const dogTop = dogHeight;
-  const dogBottom = dogHeight + 80;
+  const dogBottom = dogHeight + animalSize;
 
   const ballLeft = ballX;
-  const ballRight = ballX + 40;
+  const ballRight = ballX + ballSize;
   const ballTop = ballY;
-  const ballBottom = ballY + 40;
+  const ballBottom = ballY + ballSize;
 
   if (
     ballLeft < dogRight &&
@@ -398,6 +425,27 @@ const ballCollisionWithDog = () => {
     ballTop < dogBottom &&
     ballBottom > dogTop
   ) {
+    // 충돌이 발생한 경우 엉덩이의 중심 위치를 계산합니다.
+    const dogCenterX = dogWidth + animalSize / 2;
+    const dogCenterY = dogHeight + animalSize / 2;
+
+    // 공의 중심 위치를 계산합니다.
+    const ballCenterX = ballX + ballSize / 2;
+    const ballCenterY = ballY + ballSize / 2;
+
+    // 엉덩이와 공의 상대적인 위치를 계산합니다.
+    const deltaX = ballCenterX - dogCenterX;
+    const deltaY = ballCenterY - dogCenterY;
+
+    // 공의 속도를 조정하여 엉덩이에서 튀어나가도록 합니다.
+    ballSpeedX = Math.sign(deltaX) * Math.abs(ballSpeedX);
+    ballSpeedY = Math.sign(deltaY) * Math.abs(ballSpeedY);
+
+    // 랜덤한 값으로 속도 벡터에 변동을 추가합니다.
+    const randomFactor = 0.2; // 조절 가능한 랜덤 요소 크기
+    ballSpeedX += Math.random() * randomFactor - randomFactor / 2;
+    ballSpeedY += Math.random() * randomFactor - randomFactor / 2;
+
     return true; // 충돌 발생
   } else {
     return false; // 충돌 없음
