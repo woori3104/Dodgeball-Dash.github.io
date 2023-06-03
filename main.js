@@ -232,6 +232,7 @@ const setupKeyboard = () => {
 
   touchPadCanvas.addEventListener("touchstart", (e) => {
     handleTouchPad(e);
+    isStart=true
     touchPadCanvas.addEventListener("touchmove", handleTouchPad);
   });
 
