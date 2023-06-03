@@ -170,9 +170,18 @@ touchPadCtx.strokeRect(0, 0, touchPadCanvas.width, touchPadCanvas.height);
 // 터치패드 이벤트 처리
 const handleTouchPad = (e) => {
   const rect = touchPadCanvas.getBoundingClientRect();
-  const touchX = e.clientX - rect.left;
-  const touchY = e.clientY - rect.top;
+  let touchX, touchY;
 
+  // 터치 이벤트인 경우
+  if (event.touches) {
+    touchX = event.changedTouches[0].clientX - rect.left;
+    touchY = event.changedTouches[0].clientY - rect.top;
+  }
+  // 마우스 클릭 이벤트인 경우
+  else {
+    touchX = event.clientX - rect.left;
+    touchY = event.clientY - rect.top;
+  }
   // 터치패드 영역 내에서 화살표 이벤트 처리
   if (
     touchX > 0 &&
@@ -219,7 +228,6 @@ const setupKeyboard = () => {
     touchArrow.right = false;
   });
 
-  // 터치패드 이벤트 리스너 등록
   touchPadCanvas.addEventListener("touchstart", (e) => {
     handleTouchPad(e);
     touchPadCanvas.addEventListener("touchmove", handleTouchPad);
