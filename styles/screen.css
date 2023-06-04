@@ -1,0 +1,67 @@
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+  
+  body {
+    background-color: #e3e3e3;
+    margin: 0;
+    overflow: hidden;
+  }
+
+.screen-frame {
+    width: 28rem;
+    height: 22rem;
+    position: absolute;
+    top: 2.45rem;
+    left: 2.56rem;
+    background-color: #bca372;
+    border: 0.2rem solid #fdf6d9d2;
+    clip-path: polygon(100% 0, 100% 100%, 49% 100%, 40% 89%, 0 89%, 0% 0%);
+    z-index: 1;
+  }
+  
+  .screen-glass {
+    width: 28rem;
+    height: 22rem;
+    position: absolute;
+    background: linear-gradient(
+      72deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.1) 30%,
+      rgba(255, 255, 255, 0) 50%,
+      rgba(255, 255, 255, 0.1) 70%,
+      rgba(255, 255, 255, 0.3) 90%,
+      rgba(255, 255, 255, 0.5) 100%
+    );
+    filter: blur(0.2rem);
+    z-index: 2;
+  }
+  
+  .contents-area {
+    width: 23.5rem;
+    height: 16.5rem;
+    background-color: #716a71;
+    position: absolute;
+    top: 1.5rem;
+    left: 2.15rem;
+    border: 0.1rem solid #716a71;
+    border-radius: 0.4rem;
+    box-shadow: 0 0 0.2rem 0.5rem #25221d inset;
+    z-index: 1;
+  }
+  
+  
+#game-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  

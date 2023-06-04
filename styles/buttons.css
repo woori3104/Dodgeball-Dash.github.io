@@ -1,0 +1,131 @@
+.btn-area {
+    width: 28rem;
+    height: 15.8rem;
+    position: absolute;
+    left: 2.8rem;
+    bottom: 2.2rem;
+    z-index: 1;
+  }
+  
+  .arrow-btn-wrap {
+    width: 11rem;
+    height: 11rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #f4e1c1;
+    border: 0.2rem solid #fdf6d99a;
+    box-shadow: 0 0 0.2rem 0.2rem #bca37270 inset;
+    border-radius: 6rem;
+    z-index: 1;
+  }
+  
+  .arrow-btn-group {
+    width: inherit;
+    height: inherit;
+    position: relative;
+  }
+  
+  .arrow-btn {
+    width: 3rem;
+    height: 4rem;
+    position: absolute;
+    background-color: #fff;
+    border: 0.2rem solid #bca372c0;
+    box-shadow: 0 0 0.1rem 0.2rem #f0e8c8 inset;
+    border-radius: 0.7rem 0.7rem 50% 50%;
+    cursor: pointer;
+  }
+  
+  .arrow-btn:nth-child(1) {
+    top: 0.8rem;
+    left: 4rem;
+    transform: rotate(0deg);
+  }
+  
+  .arrow-btn:nth-child(2) {
+    top: 3.52rem;
+    left: 6.9rem;
+    transform: rotate(90deg);
+  }
+  
+  .arrow-btn:nth-child(3) {
+    top: 6.2rem;
+    left: 4rem;
+    transform: rotate(180deg);
+  }
+  
+  .arrow-btn:nth-child(4) {
+    top: 3.52rem;
+    left: 1.1rem;
+    transform: rotate(270deg);
+  }
+  
+  .menu-area {
+    display: flex;
+    width: 14.8rem;
+    height: 8.5rem;
+    position: absolute;
+    top: 2.5rem;
+    right: 0;
+    z-index: 1;
+  }
+  
+  .menu-btn-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 9rem;
+    height: inherit;
+  }
+  
+  .menu-btn-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 4rem;
+    height: 3.2rem;
+  }
+  
+  .menu-btn-group p {
+    color: #25221d;
+    font-size: 0.05rem;
+    filter: blur(0.02rem);
+  }
+  
+  .menu-btn {
+    width: 2.6rem;
+    height: 2rem;
+    background-color: #fff;
+    border: 0.2rem solid #bca372c0;
+    border-radius: 0.95rem;
+    box-shadow: 0 0 0.1rem 0.2rem #f0e8c8 inset;
+    cursor: pointer;
+  }
+  
+  .rotate-btn {
+    width: 3.5rem;
+    height: 3.5rem;
+    position: absolute;
+    top: 1.65rem;
+    right: 1.08rem;
+    background-color: #fff;
+    border: 0.2rem solid #bca372c0;
+    border-radius: 2rem;
+    box-shadow: 0 0 0.1rem 0.2rem #f0e8c8 inset;
+    z-index: 1;
+    cursor: pointer;
+  }
+  
+  .rotate-text {
+    width: 30%;
+    height: auto;
+    position: absolute;
+    top: 0.2rem;
+    right: 0;
+    transform-origin: center;
+    fill: #25221d;
+    filter: blur(0.02rem);
+  }
+  

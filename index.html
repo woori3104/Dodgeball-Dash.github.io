@@ -1,18 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
 
-<button id="restart">Restart</button>
-<button id="difficulty">Change Difficulty</button>
-<canvas id="game-canvas">
-  
-</canvas>
-  <script src="main.js"></script>  
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="./styles/screen.css">
+  <link rel="stylesheet" type="text/css" href="./styles/buttons.css">
+  <link rel="stylesheet" type="text/css" href="./styles/styles.css">
+</head>
+
+<body>
+  <div class="body-shape">
+    <div class="screen-frame">
+      <div class="screen-glass"></div>
+      <div class="contents-area">
+        <canvas id="game-canvas"></canvas>
+      </div>
+    </div>
+    <section class="btn-area">
+      <div class="arrow-btn-wrap">
+        <div class="arrow-btn-group">
+          <button class="arrow-btn up-button"></button>
+          <button class="arrow-btn right-button"></button>
+          <button class="arrow-btn left-button"></button>
+          <button class="arrow-btn down-button"></button>
+        </div>
+      </div>
+      <div class="menu-area">
+        <div class="menu-btn-wrap">
+          <div class="menu-btn-group">
+            <button class="menu-btn" onClick={musicStartPause} />
+            <p>MUSIC</p>
+          </div>
+          <div class="menu-btn-group">
+            <button class="menu-btn"></button>
+            <p>RESET</p>
+          </div>
+          <div class="menu-btn-group">
+            <button class="menu-btn"></button>
+            <p>STOP</p>
+          </div>
+          <div class="menu-btn-group">
+            <button class="menu-btn"></button>
+            <p>ON/OFF</p>
+          </div>
+        </div>
+        <button class="rotate-btn"></button>
+        <svg class="rotate-text" viewBox="0 0 95 95" width="50" height="50">
+          <defs>
+            <path id="circle" d="
+                  M 50, 50
+                  m -51, 15
+                  a 37,37 0 1,1 78,0
+                  a 37,37 0 1,1 -74,0" />
+          </defs>
+          <text fontSize="0.85rem">
+            <textPath xlinkHref="#circle">&nbsp;&nbsp;&nbsp;&nbsp;ROTATE</textPath>
+          </text>
+        </svg>
+      </div>
+    </section>
+  </div>
+  <script src="main.js"></script>
 </body>
+
 </html>
