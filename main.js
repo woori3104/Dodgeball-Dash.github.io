@@ -375,7 +375,7 @@ const catMovement = () => {
   const dy = targetY - catY;
 
   const distance = Math.sqrt(dx * dx + dy * dy);
-  const speed = Math.min(distance, difficulty);
+  const speed = Math.min(distance, difficulty+1);
 
   const vx = (speed * dx) / distance;
   const vy = (speed * dy) / distance;

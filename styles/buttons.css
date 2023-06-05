@@ -63,7 +63,7 @@
   
   .menu-area {
     display: flex;
-    width: 14.8rem;
+    width: 11.8rem;
     height: 8.5rem;
     position: absolute;
     top: 2.5rem;
@@ -102,30 +102,5 @@
     border-radius: 0.95rem;
     box-shadow: 0 0 0.1rem 0.2rem #f0e8c8 inset;
     cursor: pointer;
-  }
-  
-  .rotate-btn {
-    width: 3.5rem;
-    height: 3.5rem;
-    position: absolute;
-    top: 1.65rem;
-    right: 1.08rem;
-    background-color: #fff;
-    border: 0.2rem solid #bca372c0;
-    border-radius: 2rem;
-    box-shadow: 0 0 0.1rem 0.2rem #f0e8c8 inset;
-    z-index: 1;
-    cursor: pointer;
-  }
-  
-  .rotate-text {
-    width: 30%;
-    height: auto;
-    position: absolute;
-    top: 0.2rem;
-    right: 0;
-    transform-origin: center;
-    fill: #25221d;
-    filter: blur(0.02rem);
   }
   
