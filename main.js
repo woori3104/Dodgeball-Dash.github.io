@@ -2,12 +2,12 @@ const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
 let ballX = canvas.width * 0.3;
 let ballY = canvas.height * 0.5;
-let catX = 0.8 * canvas.width;
-let catY = 0.8 * canvas.height;
+let catX = 0.7 * canvas.width;
+let catY = 0.8 * canvas.height - 8;
 let ballSize = 25;
 let animalSize = 0.1 * canvas.width + 10;
 let dogWidth = 0.2 * canvas.width;
-let dogHeight = 0.8 * canvas.height;
+let dogHeight = 0.8 * canvas.height - 8;
 let dogScore = 0;
 let catScore = 0;
 let isStart = false;
@@ -28,6 +28,7 @@ const upBtn = document.querySelector(".up-button");
 const leftBtn = document.querySelector(".left-button");
 const rightBtn = document.querySelector(".right-button");
 const downBtn = document.querySelector(".down-button");
+const resetBtn = document.querySelector(".reset-btn");
 const keyDown = {};
 /**
  * Image Load
@@ -131,6 +132,21 @@ const setupKeyboard = () => {
     delete keyDown[e.keyCode];
   });
 
+  // 버튼을 클릭하면 게임을 재시작하거나 난이도를 변경
+  resetBtn.addEventListener("click", function () {
+    dogScore = 0;
+    catScore = 0;
+    resetPositions();
+    isStart=false;
+  });
+  // 버튼을 클릭하면 게임을 재시작하거나 난이도를 변경
+  resetBtn.addEventListener("mousedown", function () {
+    dogScore = 0;
+    catScore = 0;
+    resetPositions();
+    isStart=false;
+  });
+
   // 버튼 누르는 이벤트 처리
   upBtn.addEventListener("mousedown", () => {
     isMovingUp = true;
@@ -222,7 +238,7 @@ const update = () => {
     dogWidth -= 2;
   }
 
-  if (isMovingRight && dogWidth + animalSize < canvas.width/2) {
+  if (isMovingRight && dogWidth + animalSize < canvas.width / 2) {
     dogWidth += 2;
   }
   if (isCollisionCooldown) {
