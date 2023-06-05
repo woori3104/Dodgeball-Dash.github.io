@@ -35,7 +35,20 @@ const downBtn = document.querySelector(".down-button");
 const resetBtn = document.querySelector(".reset-btn");
 const stopBtn = document.querySelector(".stop-btn");
 const difficultyBtn = document.querySelector(".difficulty-btn");
+const musicBtn = document.querySelector(".music-btn");
 const keyDown = {};
+const audio = new Audio("music/bgm.mp3");
+let isMusicPlaying = false;
+
+const playMusic = () => {
+  audio.play();
+  isMusicPlaying = true;
+}
+const stopMusic = () => {
+  audio.pause();
+  audio.currentTime = 0;
+  isMusicPlaying = false;
+}
 /**
  * Image Load
  */
@@ -275,6 +288,20 @@ const setupKeyboard = () => {
 
   rightBtn.addEventListener("touchend", () => {
     isMovingRight = false;
+  });
+  musicBtn.addEventListener("click", function () {
+    if (isMusicPlaying) {
+      stopMusic();
+    } else {
+      playMusic();
+    }
+  });
+  musicBtn.addEventListener("touchend", function () {
+    if (isMusicPlaying) {
+      stopMusic();
+    } else {
+      playMusic();
+    }
   });
 };
 const update = () => {
