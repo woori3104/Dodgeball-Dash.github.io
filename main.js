@@ -21,9 +21,8 @@ let isMovingLeft = false;
 let isMovingRight = false;
 let isCollisionCooldown = false;
 
-
 let lastCollisionTime = 0;
-const collisionCooldownDuration = 800; 
+const collisionCooldownDuration = 800;
 
 const upBtn = document.querySelector(".up-button");
 const leftBtn = document.querySelector(".left-button");
@@ -111,6 +110,14 @@ const getAnimalCenter = (x, y) => {
   return { centerX, centerY };
 };
 
+// 터치패드 화살표 관련 변수
+let touchArrow = {
+  up: false,
+  down: false,
+  left: false,
+  right: false,
+};
+
 const setupKeyboard = () => {
   document.addEventListener("keydown", function (e) {
     keyDown[e.keyCode] = true;
@@ -159,6 +166,42 @@ const setupKeyboard = () => {
   });
 
   rightBtn.addEventListener("mouseup", () => {
+    isMovingRight = false;
+  });
+
+  upBtn.addEventListener("touchstart", () => {
+    isMovingUp = true;
+    isStart = true;
+  });
+
+  downBtn.addEventListener("touchstart", () => {
+    isMovingDown = true;
+    isStart = true;
+  });
+
+  leftBtn.addEventListener("touchstart", () => {
+    isMovingLeft = true;
+    isStart = true;
+  });
+
+  rightBtn.addEventListener("touchstart", () => {
+    isMovingRight = true;
+    isStart = true;
+  });
+
+  upBtn.addEventListener("touchend", () => {
+    isMovingUp = false;
+  });
+
+  downBtn.addEventListener("touchend", () => {
+    isMovingDown = false;
+  });
+
+  leftBtn.addEventListener("touchend", () => {
+    isMovingLeft = false;
+  });
+
+  rightBtn.addEventListener("touchend", () => {
     isMovingRight = false;
   });
 };
