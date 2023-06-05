@@ -15,12 +15,16 @@ let ball, cat, dog, background;
 
 let ballSpeedX = 0;
 let ballSpeedY = 0;
+
+let backUpBallSpeedX = 0;
+let backUpBallSpeedY = 0;
+
 let isMovingUp = false;
 let isMovingDown = false;
 let isMovingLeft = false;
 let isMovingRight = false;
 let isCollisionCooldown = false;
-
+let difficulty = 1;
 let lastCollisionTime = 0;
 const collisionCooldownDuration = 800;
 
@@ -29,6 +33,8 @@ const leftBtn = document.querySelector(".left-button");
 const rightBtn = document.querySelector(".right-button");
 const downBtn = document.querySelector(".down-button");
 const resetBtn = document.querySelector(".reset-btn");
+const stopBtn = document.querySelector(".stop-btn");
+const difficultyBtn = document.querySelector(".difficulty-btn");
 const keyDown = {};
 /**
  * Image Load
@@ -99,15 +105,15 @@ const handleCollision = (centerX, centerY) => {
 };
 
 const handleAnimalCollision = (centerX, centerY) => {
-  const animalCenterX = centerX + 20;
-  const animalCenterY = centerY + 20;
+  const animalCenterX = centerX + 30;
+  const animalCenterY = centerY + 30;
 
   handleCollision(animalCenterX, animalCenterY);
 };
 
 const getAnimalCenter = (x, y) => {
-  const centerX = x + 20;
-  const centerY = y + 20;
+  const centerX = x + 30;
+  const centerY = y + 30;
   return { centerX, centerY };
 };
 
@@ -119,6 +125,11 @@ let touchArrow = {
   right: false,
 };
 
+let isGamePaused = false; // 게임 일시정지 상태를 나타내는 변수
+
+const stopGameLoop =() =>{
+  cancelAnimationFrame(gameLoopId);
+}
 const setupKeyboard = () => {
   document.addEventListener("keydown", function (e) {
     keyDown[e.keyCode] = true;
@@ -126,46 +137,87 @@ const setupKeyboard = () => {
       !isStart &&
       (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40)
     )
-      isStart = true;
+    isGamePaused = true;
+      isStart = false;
   });
   document.addEventListener("keyup", function (e) {
     delete keyDown[e.keyCode];
   });
 
-  // 버튼을 클릭하면 게임을 재시작하거나 난이도를 변경
-  resetBtn.addEventListener("click", function () {
-    dogScore = 0;
-    catScore = 0;
-    resetPositions();
-    isStart=false;
+  stopBtn.addEventListener("click", function () {
+    if (!isGamePaused) {
+      // 게임이 진행 중인 상태에서 버튼을 터치하면 일시정지
+      backUpBallSpeedX = ballSpeedX;
+      backUpBallSpeedY = ballSpeedY;
+      ballSpeedX = 0;
+      ballSpeedY = 0;
+      isGamePaused = true;
+      isStart = false; 
+    } 
   });
-  // 버튼을 클릭하면 게임을 재시작하거나 난이도를 변경
+
+  stopBtn.addEventListener("touchend", function () {
+    if (!isGamePaused) {
+      // 게임이 진행 중인 상태에서 버튼을 터치하면 일시정지
+      backUpBallSpeedX = ballSpeedX;
+      backUpBallSpeedY = ballSpeedY;
+      ballSpeedX = 0;
+      ballSpeedY = 0;
+      isGamePaused = true;
+      isStart = false; 
+    } 
+  });
+
+  difficultyBtn.addEventListener("mouseup", function () {
+    difficulty++;
+  if (difficulty > 3) {
+    difficulty = 1;
+  }
+  });
+  difficultyBtn.addEventListener("touchend", function () {
+    difficulty++;
+  if (difficulty > 3) {
+    difficulty = 1;
+  }
+  });
+
   resetBtn.addEventListener("mousedown", function () {
     dogScore = 0;
     catScore = 0;
     resetPositions();
-    isStart=false;
+    isStart = false;
   });
+    // 버튼을 클릭하면 게임을 재시작하거나 난이도를 변경
+    resetBtn.addEventListener("touchstart", function () {
+      dogScore = 0;
+      catScore = 0;
+      resetPositions();
+      isStart = false;
+    });
 
   // 버튼 누르는 이벤트 처리
   upBtn.addEventListener("mousedown", () => {
     isMovingUp = true;
     isStart = true;
+    isGamePaused = false;
   });
 
   downBtn.addEventListener("mousedown", () => {
     isMovingDown = true;
     isStart = true;
+    isGamePaused = false;
   });
 
   leftBtn.addEventListener("mousedown", () => {
     isMovingLeft = true;
     isStart = true;
+    isGamePaused = false;
   });
 
   rightBtn.addEventListener("mousedown", () => {
     isMovingRight = true;
     isStart = true;
+    isGamePaused = false;
   });
 
   // 버튼 떼는 이벤트 처리
@@ -188,21 +240,25 @@ const setupKeyboard = () => {
   upBtn.addEventListener("touchstart", () => {
     isMovingUp = true;
     isStart = true;
+    isGamePaused = false;
   });
 
   downBtn.addEventListener("touchstart", () => {
     isMovingDown = true;
     isStart = true;
+    isGamePaused = false;
   });
 
   leftBtn.addEventListener("touchstart", () => {
     isMovingLeft = true;
     isStart = true;
+    isGamePaused = false;
   });
 
   rightBtn.addEventListener("touchstart", () => {
     isMovingRight = true;
     isStart = true;
+    isGamePaused = false;
   });
 
   upBtn.addEventListener("touchend", () => {
@@ -292,7 +348,7 @@ const catMovement = () => {
   const dy = targetY - catY;
 
   const distance = Math.sqrt(dx * dx + dy * dy);
-  const speed = Math.min(distance, 2);
+  const speed = Math.min(distance, difficulty);
 
   const vx = (speed * dx) / distance;
   const vy = (speed * dy) / distance;
@@ -316,16 +372,27 @@ const catMovement = () => {
   catY = newCatY;
 };
 
+const drawDifficulty = () => {
+  ctx.fillStyle = "black";
+  ctx.font = "15px Arial";
+  ctx.fillText(
+    "Difficulty: " + ["Easy", "Medium", "Hard"][difficulty - 1],
+    10,
+    40
+  );
+};
+
 const render = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
   ctx.drawImage(ball, ballX, ballY, ballSize, ballSize);
   ctx.drawImage(dog, dogWidth, dogHeight, animalSize, animalSize);
   ctx.drawImage(cat, catX, catY, animalSize, animalSize);
+  drawDifficulty();
   ctx.fillStyle = "black";
-  ctx.font = "20px Arial";
-  ctx.fillText("Dog: " + dogScore, 10, 30);
-  ctx.fillText("Cat: " + catScore, canvas.width - 80, 30);
+  ctx.font = "15px Arial";
+  ctx.fillText("Dog: " + dogScore, 10, 20);
+  ctx.fillText("Cat: " + catScore, canvas.width - 80, 20);
 };
 
 const randomizeBallSpeed = () => {
@@ -356,8 +423,8 @@ const resetPositions = () => {
 const main = () => {
   loadImage(); // 이미지 로드
   const gameLoop = () => {
-    render();
-
+    if(!isGamePaused)
+      render();
     requestAnimationFrame(gameLoop);
   };
 
