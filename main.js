@@ -211,20 +211,19 @@ const update = () => {
   if (38 in keyDown) dogHeight -= 5; // 위쪽 방향키
   if (40 in keyDown) dogHeight += 5; // 아래쪽 방향키
   if (isMovingUp && dogHeight > 0) {
-    dogHeight -= 5;
+    dogHeight -= 2;
   }
 
   if (isMovingDown && dogHeight + animalSize < canvas.height) {
-    dogHeight += 5;
+    dogHeight += 2;
   }
 
-  const leftHalfWidth = canvas.width / 2;
   if (isMovingLeft && dogWidth > 0) {
-    dogWidth -= 5;
+    dogWidth -= 2;
   }
 
   if (isMovingRight && dogWidth + animalSize < canvas.width/2) {
-    dogWidth += 5;
+    dogWidth += 2;
   }
   if (isCollisionCooldown) {
     const currentTime = Date.now();
