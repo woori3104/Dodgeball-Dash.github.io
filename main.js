@@ -218,11 +218,12 @@ const update = () => {
     dogHeight += 5;
   }
 
-  if (isMovingLeft && dogWidth / 2 > 0) {
+  const leftHalfWidth = canvas.width / 2;
+  if (isMovingLeft && dogWidth > 0) {
     dogWidth -= 5;
   }
 
-  if (isMovingRight && dogWidth + animalSize < canvas.width) {
+  if (isMovingRight && dogWidth + animalSize < canvas.width/2) {
     dogWidth += 5;
   }
   if (isCollisionCooldown) {
