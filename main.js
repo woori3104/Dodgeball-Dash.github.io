@@ -120,11 +120,11 @@ const handleCollision = (centerX, centerY) => {
   const collisionFactor = 1.5;
   isCollisionCooldown = true;
   if (centerX < ballX) {
-    ballX =+ 10
+    ballX =+2
   } 
 
   if (centerY < ballY) {
-    ballY =+10;
+    ballY =+2;
   }
   setTimeout(() => {
     isCollisionCooldown = false;
@@ -132,8 +132,8 @@ const handleCollision = (centerX, centerY) => {
 
 
   // 새로운 속도를 X축과 Y축 속도로 변환합니다.
-  ballSpeedX = (Math.cos(angle) * speed) * collisionFactor;
-  ballSpeedY = (Math.sin(angle) * speed ) * collisionFactor;
+  ballSpeedX = Math.cos(angle) * speed * collisionFactor;
+  ballSpeedY = Math.sin(angle) * speed  * collisionFactor;
 
 };
 
@@ -247,32 +247,23 @@ const setupKeyboard = () => {
   difficultyBtn.addEventListener("mouseup", function () {
     difficulty++;
 
-    ballSpeedX++;
     if (difficulty > 2) {
       difficulty = 0;
-      ballSpeedX = 2;
     }
   });
   difficultyBtn.addEventListener("touchend", function () {
     difficulty++;
-
-    ballSpeedX++;
   
     if (difficulty > 2) {
       difficulty = 0;
-
-      ballSpeedX = 2;
     }
   });
   difficultyBtn.addEventListener("click", function () {
     difficulty++;
 
-    ballSpeedX++;
   
     if (difficulty > 2) {
       difficulty = 0;
-
-      ballSpeedX = 2;
     }
   });
   resetBtn.addEventListener("mousedown", function () {
@@ -446,6 +437,7 @@ const update = () => {
     ballX = canvas.width - ballSize;
   }
 
+
   if (isCollisionCooldown) {
     const currentTime = Date.now();
     const elapsed = currentTime - lastCollisionTime;
@@ -457,20 +449,14 @@ const update = () => {
     if (ballCollision(dogWidth, dogHeight, animalSize)) {
       const { centerX, centerY } = getAnimalCenter(dogWidth, dogHeight);
       handleAnimalCollision(centerX, centerY);
-      console.log('ssssddd')
       isCollisionCooldown = true;
-      dogWidth -=10;
-      dogHeight -=10;
       lastCollisionTime = Date.now();
-    } 
+    }
     if (ballCollision(catX, catY, animalSize)) {
       const { centerX, centerY } = getAnimalCenter(catX, catY);
       handleAnimalCollision(centerX, centerY);
       isCollisionCooldown = true;
-      catX +=10;
-      catY +=10;
       lastCollisionTime = Date.now();
-      console.log('ca')
     }
   }
 
@@ -490,6 +476,7 @@ const update = () => {
     dogScore += 5;
     resetPositions();
   }
+
 };
 
 const catMovement = () => {
@@ -500,8 +487,8 @@ const catMovement = () => {
   const targetX = ballX;
   const targetY = ballY;
 
-  const dx = targetX - catX;
-  const dy = targetY - catY;
+  const dx = targetX - catX-10;
+  const dy = targetY - catY-10;
 
   const distance = Math.sqrt(dx * dx + dy * dy);
   const speed = Math.min(distance, difficulty * 2 + 1);
