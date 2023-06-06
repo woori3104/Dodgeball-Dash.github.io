@@ -66,7 +66,6 @@ const loadImage = () => {
   // 이미지 로드가 완료되면 게임 시작
   ball.onload = main;
 };
-
 const ballCollision = (objectX, objectY, objectSize) => {
   const objectLeft = objectX;
   const objectRight = objectX + objectSize;
@@ -85,27 +84,14 @@ const ballCollision = (objectX, objectY, objectSize) => {
     ballTop < objectBottom - distanceThreshold &&
     ballBottom > objectTop + distanceThreshold
   ) {
-    const objectCenterX = objectX + objectSize / 2;
-    const objectCenterY = objectY + objectSize / 2;
-
-    const ballCenterX = ballX + ballSize / 2;
-    const ballCenterY = ballY + ballSize / 2;
-
-    const deltaX = ballCenterX - objectCenterX;
-    const deltaY = ballCenterY - objectCenterY;
-
-    ballSpeedX = Math.sign(deltaX) * Math.abs(ballSpeedX);
-    ballSpeedY = Math.sign(deltaY) * Math.abs(ballSpeedY);
-
-    const randomFactor = 0.2;
-    ballSpeedX += Math.random() * randomFactor - randomFactor / 2;
-    ballSpeedY += Math.random() * randomFactor - randomFactor / 2;
-
+    // 충돌 감지를 위한 계산을 최소화할 수 있도록 수정
     return true; // 충돌 발생
   } else {
     return false; // 충돌 없음
   }
 };
+
+
 const handleCollision = (centerX, centerY) => {
   const ballCenterX = ballX + ballSize / 2;
   const ballCenterY = ballY + ballSize / 2;
@@ -205,19 +191,7 @@ const stopGameLoop = () => {
   cancelAnimationFrame(gameLoopId);
 };
 const setupKeyboard = () => {
-  document.addEventListener("keydown", function (e) {
-    keyDown[e.keyCode] = true;
-    if (
-      !isStart &&
-      (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40)
-    )
-      isGamePaused = true;
-    isStart = false;
-  });
-  document.addEventListener("keyup", function (e) {
-    delete keyDown[e.keyCode];
-  });
-
+ 
   stopBtn.addEventListener("click", function () {
     if (!isGamePaused) {
       // 게임이 진행 중인 상태에서 버튼을 터치하면 일시정지
@@ -403,10 +377,6 @@ const checkCollision = () => {
 
 const update = () => {
   checkCollision();
-  if (39 in keyDown) dogWidth += 5; // 오른쪽 방향키
-  if (37 in keyDown) dogWidth -= 5; // 왼쪽 방향키
-  if (38 in keyDown) dogHeight -= 5; // 위쪽 방향키
-  if (40 in keyDown) dogHeight += 5; // 아래쪽 방향키
   if (isMovingUp && dogHeight > 0) {
     dogHeight -= 5;
   }
@@ -422,6 +392,7 @@ const update = () => {
   if (isMovingRight && dogWidth + animalSize < canvas.width / 2) {
     dogWidth += 5;
   }
+
   if (ballY < 0) {
     ballY = 0;
   } else if (ballY + ballSize > canvas.height) {
