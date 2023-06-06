@@ -116,25 +116,23 @@ const handleCollision = (centerX, centerY) => {
   const angle = Math.atan2(deltaY, deltaX); // 공과 충돌하는 대상 사이의 각도를 계산합니다.
 
   const speed = Math.sqrt(ballSpeedX * ballSpeedX + ballSpeedY * ballSpeedY); // 공의 현재 속도를 계산합니다.
-  
+
   const collisionFactor = 1.5;
   isCollisionCooldown = true;
   if (centerX < ballX) {
-    ballX =+2
-  } 
+    ballX += 2;
+  }
 
   if (centerY < ballY) {
-    ballY =+2;
+    ballY += 2;
   }
   setTimeout(() => {
     isCollisionCooldown = false;
   }, collisionCooldownDuration);
 
-
   // 새로운 속도를 X축과 Y축 속도로 변환합니다.
   ballSpeedX = Math.cos(angle) * speed * collisionFactor;
-  ballSpeedY = Math.sin(angle) * speed  * collisionFactor;
-
+  ballSpeedY = Math.sin(angle) * speed * collisionFactor;
 };
 
 const handleAnimalCollision = (centerX, centerY) => {
@@ -253,7 +251,7 @@ const setupKeyboard = () => {
   });
   difficultyBtn.addEventListener("touchend", function () {
     difficulty++;
-  
+
     if (difficulty > 2) {
       difficulty = 0;
     }
@@ -261,7 +259,6 @@ const setupKeyboard = () => {
   difficultyBtn.addEventListener("click", function () {
     difficulty++;
 
-  
     if (difficulty > 2) {
       difficulty = 0;
     }
@@ -397,7 +394,7 @@ const checkCollision = () => {
   if (ballCollision(dogWidth, dogHeight, animalSize)) {
     const { centerX, centerY } = getAnimalCenter(dogWidth, dogHeight);
     handleAnimalCollision(centerX, centerY);
-  } 
+  }
   if (ballCollision(catX, catY, animalSize)) {
     const { centerX, centerY } = getAnimalCenter(catX, catY);
     handleAnimalCollision(centerX, centerY);
@@ -405,7 +402,7 @@ const checkCollision = () => {
 };
 
 const update = () => {
-  checkCollision()
+  checkCollision();
   if (39 in keyDown) dogWidth += 5; // 오른쪽 방향키
   if (37 in keyDown) dogWidth -= 5; // 왼쪽 방향키
   if (38 in keyDown) dogHeight -= 5; // 위쪽 방향키
@@ -436,7 +433,6 @@ const update = () => {
   } else if (ballX + ballSize > canvas.width) {
     ballX = canvas.width - ballSize;
   }
-
 
   if (isCollisionCooldown) {
     const currentTime = Date.now();
@@ -476,7 +472,6 @@ const update = () => {
     dogScore += 5;
     resetPositions();
   }
-
 };
 
 const catMovement = () => {
@@ -487,12 +482,12 @@ const catMovement = () => {
   const targetX = ballX;
   const targetY = ballY;
 
-  const dx = targetX - catX-10;
-  const dy = targetY - catY-10;
+  const dx = targetX - catX - 10;
+  const dy = targetY - catY - 10;
 
   const distance = Math.sqrt(dx * dx + dy * dy);
   const speed = Math.min(distance, difficulty * 2 + 1);
-  
+
   const vx = (speed * dx) / distance;
   const vy = (speed * dy) / distance;
 
