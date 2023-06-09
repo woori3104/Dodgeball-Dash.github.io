@@ -222,7 +222,7 @@ const startGame = () => {
   let isGamePaused = false;
   let backUpBallXSpeed = 0;
   let backUpBallYSpeed = 0;
-  
+
   const handlePauseEvent = () => {
     const stopBtn = document.querySelector(".stop-btn");
 
@@ -236,17 +236,17 @@ const startGame = () => {
         isGamePaused = true;
         isStart = false;
       } else {
-        ballXSpeed = backUpBallXSpeed
-        ballYSpeed = backUpBallYSpeed
+        ballXSpeed = backUpBallXSpeed;
+        ballYSpeed = backUpBallYSpeed;
         isGamePaused = false;
         isStart = true;
       }
-    }
+    };
     stopBtn.addEventListener("mouseup", function () {
-      gamePausedEvent()
+      gamePausedEvent();
     });
     stopBtn.addEventListener("touchend", function () {
-      gamePausedEvent()
+      gamePausedEvent();
     });
   };
 
@@ -294,10 +294,28 @@ const startGame = () => {
     });
   };
 
+  const handleResetEvent = () => {
+    const resetData = () => {
+      dogScore = 0;
+      catScore = 0;
+      resetPositions();
+      isStart = false;
+    }
+    const resetBtn = document.querySelector(".reset-btn");
+    resetBtn.addEventListener("mousedown", function () {
+      resetData()
+    });
+    // 버튼을 클릭하면 게임을 재시작하거나 난이도를 변경
+    resetBtn.addEventListener("touchstart", function () {
+      resetData()
+    });
+  };
+
   const handleEvent = () => {
     handleDifficulty();
     setupMoveEvent();
     handlePauseEvent();
+    handleResetEvent()
   };
 
   const updateDogCoordinate = () => {
