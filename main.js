@@ -300,14 +300,45 @@ const startGame = () => {
       catScore = 0;
       resetPositions();
       isStart = false;
-    }
+    };
     const resetBtn = document.querySelector(".reset-btn");
     resetBtn.addEventListener("mousedown", function () {
-      resetData()
+      resetData();
     });
     // 버튼을 클릭하면 게임을 재시작하거나 난이도를 변경
     resetBtn.addEventListener("touchstart", function () {
-      resetData()
+      resetData();
+    });
+  };
+
+  let isMusicPlaying = false;
+  const handleMusicEvent = () => {
+    const audio = new Audio("music/bgm.mp3");
+    const musicBtn = document.querySelector(".music-btn");
+    const playMusic = () => {
+      audio.play();
+      isMusicPlaying = true;
+    };
+    const stopMusic = () => {
+      audio.pause();
+      audio.currentTime = 0;
+      isMusicPlaying = false;
+    };
+
+    musicBtn.addEventListener("mousedown", function () {
+      if (isMusicPlaying) {
+        stopMusic();
+      } else {
+        playMusic();
+      }
+    });
+
+    musicBtn.addEventListener("touchend", function () {
+      if (isMusicPlaying) {
+        stopMusic();
+      } else {
+        playMusic();
+      }
     });
   };
 
@@ -315,7 +346,8 @@ const startGame = () => {
     handleDifficulty();
     setupMoveEvent();
     handlePauseEvent();
-    handleResetEvent()
+    handleResetEvent();
+    handleMusicEvent();
   };
 
   const updateDogCoordinate = () => {
