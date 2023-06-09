@@ -45,15 +45,37 @@ const startGame = () => {
     isMovingRight: false,
   };
 
-  const handleMoveStart = (direction) => {
-    moveState[direction] = true;
-    console.log(moveState);
+  let ballXSpeed = 0;
+  let ballYSpeed = 0;
+  const updateBallCord = () => {
+    updateBallSpeed()
+    ballX += ballXSpeed;
+    ballY += ballYSpeed;
   };
 
-  const handleMoveEnd = (direction) => {
-    moveState[direction] = false;
-    console.log(moveState);
+  const updateBallSpeed = () => {
+    // 수평 이동 속도
+    ballXSpeed = 3;
+    // 수직 이동 속도
+    ballYSpeed = 3;
   };
+  
+  const checkCollision = () => {
+    const ballRight = ballX + ballSize;
+    const ballBottom = ballY + ballSize;
+    const dogRight = dogX + animalSize;
+    const dogBottom = dogY + animalSize;
+
+    if (
+      ballX < dogRight &&
+      ballRight > dogX &&
+      ballY < dogBottom &&
+      ballBottom > dogY
+    ) {
+      updateBallCord()
+    }
+  };
+
   const setupMoveEvent = () => {
     const moveButtons = {
       up: document.querySelector(".up-button"),
@@ -97,7 +119,6 @@ const startGame = () => {
       );
     });
   };
-  
 
   const updateDogCoordinate = () => {
     if (moveState.isMovingUp && dogY > 0) {
@@ -121,6 +142,7 @@ const startGame = () => {
 
     const gameLoop = () => {
       updateDogCoordinate();
+      checkCollision()
       render(cat, dog, ball, background);
       requestAnimationFrame(gameLoop);
     };

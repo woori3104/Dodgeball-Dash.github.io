@@ -1,29 +1,32 @@
 const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
-const ballSize = 25;
-const animalSize = 0.1 * canvas.width + 10;
-let ballX, ballY, catX, catY, dogWidth, dogHeight;
-let ballSpeedX, ballSpeedY, dogScore, catScore;
+let ballX = canvas.width * 0.3;
+let ballY = canvas.height * 0.5;
+let catX = 0.7 * canvas.width;
+let catY = 0.8 * canvas.height - 8;
+let ballSize = 25;
+let animalSize = 0.1 * canvas.width + 10;
+let dogWidth = 0.2 * canvas.width;
+let dogHeight = 0.8 * canvas.height - 8;
+let dogScore = 0;
+let catScore = 0;
 let isStart = false;
+let ball, cat, dog, background;
 let isPowerMode = false;
+let ballSpeedX = 0;
+let ballSpeedY = 0;
 let isButtonPressed = false;
-let isCollisionCooldown = false;
-let difficulty = 0;
-let lastCollisionTime = 0;
-
-const ball = new Image();
-ball.src = "images/ball.png";
-const cat = new Image();
-cat.src = "images/cat.png";
-const dog = new Image();
-dog.src = "images/dog.png";
-const background = new Image();
-background.src = "images/background.png";
+let backUpBallSpeedX = 0;
+let backUpBallSpeedY = 0;
 
 let isMovingUp = false;
 let isMovingDown = false;
 let isMovingLeft = false;
 let isMovingRight = false;
+let isCollisionCooldown = false;
+let difficulty = 0;
+let lastCollisionTime = 0;
+const collisionCooldownDuration = 400;
 
 const upBtn = document.querySelector(".up-button");
 const leftBtn = document.querySelector(".left-button");
@@ -33,82 +36,36 @@ const resetBtn = document.querySelector(".reset-btn");
 const stopBtn = document.querySelector(".stop-btn");
 const difficultyBtn = document.querySelector(".difficulty-btn");
 const musicBtn = document.querySelector(".music-btn");
-const powerBtn = document.querySelector(".power-btn");
-
 const keyDown = {};
 const audio = new Audio("music/bgm.mp3");
+const powerBtn = document.querySelector(".power-btn");
 let isMusicPlaying = false;
 
 const playMusic = () => {
   audio.play();
   isMusicPlaying = true;
 };
-
 const stopMusic = () => {
   audio.pause();
   audio.currentTime = 0;
   isMusicPlaying = false;
 };
-
-const resetPositions = () => {
-  dogWidth = canvas.width * 0.1;
-  dogHeight = canvas.height * 0.8;
-  isStart = false;
-
-  ballX = canvas.width * 0.4;
-  ballY = canvas.height * 0.5;
-  catX = canvas.width * 0.8;
-  catY = canvas.height * 0.8;
-
-  catSpeedX = 0;
-  catSpeedY = 0;
-  isStart = false;
-  ballSpeedX = 0;
-  ballSpeedY = 0;
-};
-
+/**
+ * Image Load
+ */
 const loadImage = () => {
-  ball.onload = () => {
-    resetPositions();
-    main();
-  };
+  ball = new Image();
+  ball.src = "images/ball.png";
+  cat = new Image();
+  cat.src = "images/cat.png";
+  dog = new Image();
+  dog.src = "images/dog.png";
+  background = new Image();
+  background.src = "images/background.png";
+
+  // 이미지 로드가 완료되면 게임 시작
+  ball.onload = main;
 };
-
-const handleCollision = (centerX, centerY) => {
-  const ballCenterX = ballX + ballSize / 2;
-  const ballCenterY = ballY + ballSize / 2;
-
-  const deltaX = ballCenterX - centerX;
-  const deltaY = ballCenterY - centerY;
-
-  const angle = Math.atan2(deltaY, deltaX);
-  const speed = Math.sqrt(ballSpeedX * ballSpeedX + ballSpeedY * ballSpeedY);
-  const randomFactor = 2;
-
-  const newAngle = angle + (Math.random() * randomFactor - randomFactor / 2);
-
-  isCollisionCooldown = true;
-
-  if (centerX < ballX) {
-    ballX = centerX - ballSize;
-  } else {
-    ballX = centerX + animalSize;
-  }
-
-  if (centerY < ballY) {
-    ballY = centerY - ballSize;
-  } else {
-    ballY = centerY + animalSize;
-  }
-
-  setTimeout(() => {
-    isCollisionCooldown = false;
-  }, collisionCooldownDuration);
-
-  ballSpeedX = Math.cos(newAngle) * speed + 2;
-  ballSpeedY = Math.sin(newAngle) * speed + 2;
-};
-
 const ballCollision = (objectX, objectY, objectSize) => {
   const objectLeft = objectX;
   const objectRight = objectX + objectSize;
@@ -121,44 +78,47 @@ const ballCollision = (objectX, objectY, objectSize) => {
   const ballBottom = ballY + ballSize;
 
   const distanceThreshold = 5;
-
   if (
     ballLeft < objectRight - distanceThreshold &&
     ballRight > objectLeft + distanceThreshold &&
     ballTop < objectBottom - distanceThreshold &&
     ballBottom > objectTop + distanceThreshold
   ) {
-    const objectCenterX = objectX + objectSize / 2;
-    const objectCenterY = objectY + objectSize / 2;
-
-    const ballCenterX = ballX + ballSize / 2;
-    const ballCenterY = ballY + ballSize / 2;
-
-    const deltaX = ballCenterX - objectCenterX;
-    const deltaY = ballCenterY - objectCenterY;
-
-    ballSpeedX = Math.sign(deltaX) * Math.abs(ballSpeedX);
-    ballSpeedY = Math.sign(deltaY) * Math.abs(ballSpeedY);
-
-    const randomFactor = 0.2;
-    ballSpeedX += Math.random() * randomFactor - randomFactor / 2;
-    ballSpeedY += Math.random() * randomFactor - randomFactor / 2;
-
-    return true;
+    // 충돌 감지를 위한 계산을 최소화할 수 있도록 수정
+    return true; // 충돌 발생
   } else {
-    return false;
+    return false; // 충돌 없음
   }
 };
 
-const checkCollision = () => {
-  if (ballCollision(dogWidth, dogHeight, animalSize)) {
-    const { centerX, centerY } = getAnimalCenter(dogWidth, dogHeight);
-    handleAnimalCollision(centerX, centerY);
-  } 
-  if (ballCollision(catX, catY, animalSize)) {
-    const { centerX, centerY } = getAnimalCenter(catX, catY);
-    handleAnimalCollision(centerX, centerY);
+
+const handleCollision = (centerX, centerY) => {
+  const ballCenterX = ballX + ballSize / 2;
+  const ballCenterY = ballY + ballSize / 2;
+
+  const deltaX = ballCenterX - centerX;
+  const deltaY = ballCenterY - centerY;
+
+  const angle = Math.atan2(deltaY, deltaX); // 공과 충돌하는 대상 사이의 각도를 계산합니다.
+
+  const speed = Math.sqrt(ballSpeedX * ballSpeedX + ballSpeedY * ballSpeedY); // 공의 현재 속도를 계산합니다.
+
+  const collisionFactor = 1.5;
+  isCollisionCooldown = true;
+  if (centerX < ballX) {
+    ballX += 2;
   }
+
+  if (centerY < ballY) {
+    ballY += 2;
+  }
+  setTimeout(() => {
+    isCollisionCooldown = false;
+  }, collisionCooldownDuration);
+
+  // 새로운 속도를 X축과 Y축 속도로 변환합니다.
+  ballSpeedX = Math.cos(angle) * speed * collisionFactor;
+  ballSpeedY = Math.sin(angle) * speed * collisionFactor;
 };
 
 const handleAnimalCollision = (centerX, centerY) => {
@@ -194,14 +154,229 @@ const getAnimalCenter = (x, y) => {
   return { centerX, centerY };
 };
 
+// 터치패드 화살표 관련 변수
+let touchArrow = {
+  up: false,
+  down: false,
+  left: false,
+  right: false,
+};
+
+let isGamePaused = false; // 게임 일시정지 상태를 나타내는 변수
+const drawBall = () => {
+  ctx.beginPath();
+  ctx.arc(ballX, ballY, ballSize / 2, 0, Math.PI * 2);
+  if (isButtonPressed && isPowerMode) {
+    ctx.fillStyle = "red"; // 버튼을 누르거나 파워 모드일 때 빨간색으로 설정
+  } else {
+    ctx.fillStyle = "black"; // 그 외의 경우에는 검은색으로 설정
+  }
+  ctx.fill();
+  ctx.closePath();
+};
+
+const increaseBallSpeed = () => {
+  if (isPowerMode) {
+    const powerFactor = 2; // 공의 속도를 빠르게 하는 요소
+
+    ballSpeedX *= powerFactor;
+    ballSpeedY *= powerFactor;
+    drawBall();
+    // 이펙트를 추가할 수 있습니다. 예를 들어, 공의 색상을 변경하거나 특정 이미지로 대체하는 등의 작업을 수행할 수 있습니다.
+    // 이펙트에 대한 구체적인 내용은 원하는 시각적인 효과에 따라 다를 수 있습니다.
+  }
+};
+
+const stopGameLoop = () => {
+  cancelAnimationFrame(gameLoopId);
+};
+const setupKeyboard = () => {
+ 
+  stopBtn.addEventListener("click", function () {
+    if (!isGamePaused) {
+      // 게임이 진행 중인 상태에서 버튼을 터치하면 일시정지
+      backUpBallSpeedX = ballSpeedX;
+      backUpBallSpeedY = ballSpeedY;
+      ballSpeedX = 0;
+      ballSpeedY = 0;
+      isGamePaused = true;
+      isStart = false;
+    }
+  });
+
+  stopBtn.addEventListener("touchend", function () {
+    if (!isGamePaused) {
+      // 게임이 진행 중인 상태에서 버튼을 터치하면 일시정지
+      backUpBallSpeedX = ballSpeedX;
+      backUpBallSpeedY = ballSpeedY;
+      ballSpeedX = 0;
+      ballSpeedY = 0;
+      isGamePaused = true;
+      isStart = false;
+    }
+  });
+
+  difficultyBtn.addEventListener("mouseup", function () {
+    difficulty++;
+
+    if (difficulty > 2) {
+      difficulty = 0;
+    }
+  });
+  difficultyBtn.addEventListener("touchend", function () {
+    difficulty++;
+
+    if (difficulty > 2) {
+      difficulty = 0;
+    }
+  });
+  difficultyBtn.addEventListener("click", function () {
+    difficulty++;
+
+    if (difficulty > 2) {
+      difficulty = 0;
+    }
+  });
+  resetBtn.addEventListener("mousedown", function () {
+    dogScore = 0;
+    catScore = 0;
+    resetPositions();
+    isStart = false;
+  });
+  // 버튼을 클릭하면 게임을 재시작하거나 난이도를 변경
+  resetBtn.addEventListener("touchstart", function () {
+    dogScore = 0;
+    catScore = 0;
+    resetPositions();
+    isStart = false;
+  });
+
+  // 버튼 누르는 이벤트 처리
+  upBtn.addEventListener("mousedown", () => {
+    isMovingUp = true;
+    isStart = true;
+    isGamePaused = false;
+  });
+
+  downBtn.addEventListener("mousedown", () => {
+    isMovingDown = true;
+    isStart = true;
+    isGamePaused = false;
+  });
+
+  leftBtn.addEventListener("mousedown", () => {
+    isMovingLeft = true;
+    isStart = true;
+    isGamePaused = false;
+  });
+
+  rightBtn.addEventListener("mousedown", () => {
+    isMovingRight = true;
+    isStart = true;
+    isGamePaused = false;
+  });
+
+  // 버튼 떼는 이벤트 처리
+  upBtn.addEventListener("mouseup", () => {
+    isMovingUp = false;
+  });
+
+  downBtn.addEventListener("mouseup", () => {
+    isMovingDown = false;
+  });
+
+  leftBtn.addEventListener("mouseup", () => {
+    isMovingLeft = false;
+  });
+
+  rightBtn.addEventListener("mouseup", () => {
+    isMovingRight = false;
+  });
+
+  upBtn.addEventListener("touchstart", () => {
+    isMovingUp = true;
+    isStart = true;
+    isGamePaused = false;
+  });
+
+  downBtn.addEventListener("touchstart", () => {
+    isMovingDown = true;
+    isStart = true;
+    isGamePaused = false;
+  });
+
+  leftBtn.addEventListener("touchstart", () => {
+    isMovingLeft = true;
+    isStart = true;
+    isGamePaused = false;
+  });
+
+  rightBtn.addEventListener("touchstart", () => {
+    isMovingRight = true;
+    isStart = true;
+    isGamePaused = false;
+  });
+
+  upBtn.addEventListener("touchend", () => {
+    isMovingUp = false;
+  });
+
+  downBtn.addEventListener("touchend", () => {
+    isMovingDown = false;
+  });
+
+  leftBtn.addEventListener("touchend", () => {
+    isMovingLeft = false;
+  });
+
+  rightBtn.addEventListener("touchend", () => {
+    isMovingRight = false;
+  });
+  musicBtn.addEventListener("click", function () {
+    if (isMusicPlaying) {
+      stopMusic();
+    } else {
+      playMusic();
+    }
+  });
+  musicBtn.addEventListener("touchend", function () {
+    if (isMusicPlaying) {
+      stopMusic();
+    } else {
+      playMusic();
+    }
+  });
+  // 버튼을 누를 때와 클릭할 때의 이벤트 처리
+  powerBtn.addEventListener("mousedown", () => {
+    isButtonPressed = true;
+    ballColor = "red"; // 버튼을 누르는 동안 볼의 색상을 빨간색으로 설정
+  });
+
+  powerBtn.addEventListener("click", () => {
+    isButtonPressed = true;
+    ballColor = "red"; // 버튼을 클릭하는 동안 볼의 색상을 빨간색으로 설정
+  });
+
+  // 버튼을 떼었을 때의 이벤트 처리
+  powerBtn.addEventListener("mouseup", () => {
+    isButtonPressed = false;
+    ballColor = "black"; // 버튼을 떼면 볼의 색상을 초기 색상으로 설정
+  });
+};
+
+const checkCollision = () => {
+  if (ballCollision(dogWidth, dogHeight, animalSize)) {
+    const { centerX, centerY } = getAnimalCenter(dogWidth, dogHeight);
+    handleAnimalCollision(centerX, centerY);
+  }
+  if (ballCollision(catX, catY, animalSize)) {
+    const { centerX, centerY } = getAnimalCenter(catX, catY);
+    handleAnimalCollision(centerX, centerY);
+  }
+};
+
 const update = () => {
   checkCollision();
-
-  if (39 in keyDown) dogWidth += 5;
-  if (37 in keyDown) dogWidth -= 5;
-  if (38 in keyDown) dogHeight -= 5;
-  if (40 in keyDown) dogHeight += 5;
-
   if (isMovingUp && dogHeight > 0) {
     dogHeight -= 5;
   }
@@ -218,6 +393,18 @@ const update = () => {
     dogWidth += 5;
   }
 
+  if (ballY < 0) {
+    ballY = 0;
+  } else if (ballY + ballSize > canvas.height) {
+    ballY = canvas.height - ballSize;
+  }
+
+  if (ballX < 0) {
+    ballX = 0;
+  } else if (ballX + ballSize > canvas.width) {
+    ballX = canvas.width - ballSize;
+  }
+
   if (isCollisionCooldown) {
     const currentTime = Date.now();
     const elapsed = currentTime - lastCollisionTime;
@@ -230,16 +417,12 @@ const update = () => {
       const { centerX, centerY } = getAnimalCenter(dogWidth, dogHeight);
       handleAnimalCollision(centerX, centerY);
       isCollisionCooldown = true;
-      dogWidth -= 10;
-      dogHeight -= 10;
       lastCollisionTime = Date.now();
-    } 
+    }
     if (ballCollision(catX, catY, animalSize)) {
       const { centerX, centerY } = getAnimalCenter(catX, catY);
       handleAnimalCollision(centerX, centerY);
       isCollisionCooldown = true;
-      catX += 10;
-      catY += 10;
       lastCollisionTime = Date.now();
     }
   }
@@ -270,8 +453,8 @@ const catMovement = () => {
   const targetX = ballX;
   const targetY = ballY;
 
-  const dx = targetX - catX;
-  const dy = targetY - catY;
+  const dx = targetX - catX - 10;
+  const dy = targetY - catY - 10;
 
   const distance = Math.sqrt(dx * dx + dy * dy);
   const speed = Math.min(distance, difficulty * 2 + 1);
@@ -298,14 +481,6 @@ const catMovement = () => {
   catY = newCatY;
 };
 
-const drawBall = () => {
-  ctx.beginPath();
-  ctx.arc(ballX, ballY, ballSize / 2, 0, Math.PI * 2);
-  ctx.fillStyle = isButtonPressed && isPowerMode ? "red" : "black";
-  ctx.fill();
-  ctx.closePath();
-};
-
 const drawDifficulty = () => {
   ctx.fillStyle = "black";
   ctx.font = "15px Arial";
@@ -325,173 +500,33 @@ const render = () => {
   ctx.fillText("Cat: " + catScore, canvas.width - 80, 20);
 };
 
+const resetPositions = () => {
+  dogWidth = canvas.width * 0.1;
+  dogHeight = canvas.height * 0.8;
+  isStart = false;
+
+  ballX = canvas.width * 0.4;
+  ballY = canvas.height * 0.5;
+  catX = canvas.width * 0.8;
+  catY = canvas.height * 0.8;
+
+  catSpeedX = 0;
+  catSpeedY = 0;
+  isStart = false;
+  ballSpeedX = 0;
+  ballSpeedY = 0;
+};
+
 const main = () => {
-  loadImage();
+  loadImage(); // 이미지 로드
   const gameLoop = () => {
     if (!isGamePaused) render();
     requestAnimationFrame(gameLoop);
   };
 
   update();
-  gameLoop();
+  gameLoop(); // 게임 루프 시작
 };
 
 main();
-
-const setupKeyboard = () => {
-  document.addEventListener("keydown", (e) => {
-    keyDown[e.keyCode] = true;
-    if (
-      !isStart &&
-      (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40)
-    ) {
-      isGamePaused = true;
-    }
-    isStart = false;
-  });
-
-  document.addEventListener("keyup", (e) => {
-    delete keyDown[e.keyCode];
-  });
-
-  stopBtn.addEventListener("click", () => {
-    if (!isGamePaused) {
-      backUpBallSpeedX = ballSpeedX;
-      backUpBallSpeedY = ballSpeedY;
-      ballSpeedX = 0;
-      ballSpeedY = 0;
-      isGamePaused = true;
-      isStart = false;
-    }
-  });
-
-  stopBtn.addEventListener("touchend", () => {
-    if (!isGamePaused) {
-      backUpBallSpeedX = ballSpeedX;
-      backUpBallSpeedY = ballSpeedY;
-      ballSpeedX = 0;
-      ballSpeedY = 0;
-      isGamePaused = true;
-      isStart = false;
-    }
-  });
-
-  difficultyBtn.addEventListener("mouseup", () => {
-    difficulty++;
-    ballSpeedX++;
-    if (difficulty > 2) {
-      difficulty = 0;
-      ballSpeedX = 2;
-    }
-  });
-
-  difficultyBtn.addEventListener("touchend", () => {
-    difficulty++;
-    ballSpeedX++;
-    if (difficulty > 2) {
-      difficulty = 0;
-      ballSpeedX = 2;
-    }
-  });
-
-  difficultyBtn.addEventListener("click", () => {
-    difficulty++;
-    ballSpeedX++;
-    if (difficulty > 2) {
-      difficulty = 0;
-      ballSpeedX = 2;
-    }
-  });
-
-  resetBtn.addEventListener("mousedown", () => {
-    dogScore = 0;
-    catScore = 0;
-    resetPositions();
-    isStart = false;
-  });
-
-  resetBtn.addEventListener("touchstart", () => {
-    dogScore = 0;
-    catScore = 0;
-    resetPositions();
-    isStart = false;
-  });
-
-  upBtn.addEventListener("mousedown", () => {
-    isMovingUp = true;
-    isStart = true;
-    isGamePaused = false;
-  });
-
-  downBtn.addEventListener("mousedown", () => {
-    isMovingDown = true;
-    isStart = true;
-    isGamePaused = false;
-  });
-
-  leftBtn.addEventListener("mousedown", () => {
-    isMovingLeft = true;
-    isStart = true;
-    isGamePaused = false;
-  });
-
-  rightBtn.addEventListener("mousedown", () => {
-    isMovingRight = true;
-    isStart = true;
-    isGamePaused = false;
-  });
-
-  upBtn.addEventListener("mouseup", () => {
-    isMovingUp = false;
-  });
-
-  downBtn.addEventListener("mouseup", () => {
-    isMovingDown = false;
-  });
-
-  leftBtn.addEventListener("mouseup", () => {
-    isMovingLeft = false;
-  });
-
-  rightBtn.addEventListener("mouseup", () => {
-    isMovingRight = false;
-  });
-
-  powerBtn.addEventListener("mousedown", () => {
-    isButtonPressed = true;
-    isPowerMode = true;
-  });
-
-  powerBtn.addEventListener("mouseup", () => {
-    isButtonPressed = false;
-    isPowerMode = false;
-  });
-
-  powerBtn.addEventListener("touchstart", () => {
-    isButtonPressed = true;
-    isPowerMode = true;
-  });
-
-  powerBtn.addEventListener("touchend", () => {
-    isButtonPressed = false;
-    isPowerMode = false;
-  });
-
-  musicBtn.addEventListener("click", () => {
-    if (isMusicPlaying) {
-      stopMusic();
-    } else {
-      playMusic();
-    }
-  });
-
-  musicBtn.addEventListener("touchend", () => {
-    if (isMusicPlaying) {
-      stopMusic();
-    } else {
-      playMusic();
-    }
-  });
-};
-
 setupKeyboard();
