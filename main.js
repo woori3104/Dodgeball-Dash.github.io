@@ -41,6 +41,9 @@ const startGame = () => {
   };
   let dogScore = 0;
   let catScore = 0;
+  let isGameEnded = false;
+  let isStart = false;
+
   const handelEndGame = () => {
     if (ballX <= ballSize) {
       catScore += 5;
@@ -52,20 +55,18 @@ const startGame = () => {
   };
 
   const resetPositions = () => {
-    dogWidth = canvas.width * 0.1;
-    dogHeight = canvas.height * 0.8;
+    ballX = 80;
+    ballY = 50;
+    catX = 250;
+    catY = 100;
+    dogX = 30;
+    dogY = 100;
+    ballSize = 25;
+    animalSize = 30;
+    ballYSpeed = 0;
+    ballXSpeed = 0;
+    isGameEnded = false;
     isStart = false;
-
-    ballX = canvas.width * 0.4;
-    ballY = canvas.height * 0.5;
-    catX = canvas.width * 0.8;
-    catY = canvas.height * 0.8;
-
-    catSpeedX = 0;
-    catSpeedY = 0;
-    isStart = false;
-    ballSpeedX = 0;
-    ballSpeedY = 0;
   };
 
   const render = (cat, dog, ball, background) => {
@@ -93,6 +94,9 @@ const startGame = () => {
   let ballYSpeed = 0;
 
   const isBallCollision = (objectX, objectY, objectSize) => {
+    if (!isStart) {
+      return;
+    }
     const objectLeft = objectX;
     const objectRight = objectX + objectSize;
     const objectTop = objectY;
@@ -125,6 +129,9 @@ const startGame = () => {
   };
 
   const updateBallCoordinates = () => {
+    if (!isStart) {
+      return;
+    }
     ballX += ballXSpeed;
     ballY += ballYSpeed;
 
@@ -151,9 +158,18 @@ const startGame = () => {
     if (ballY < 0 || ballY + ballSize > canvas.height) {
       ballYSpeed = -ballYSpeed;
     }
+
+    if (isGameEnded) {
+      ballXSpeed = 0;
+      ballYSpeed = 0;
+    }
   };
+
   let difficulty = 1;
   const catMovement = () => {
+    if (!isStart || isGameEnded) {
+      return;
+    }
     const targetX = ballX;
     const targetY = ballY;
 
@@ -203,6 +219,36 @@ const startGame = () => {
       }
     });
   };
+  let isGamePaused = false;
+  let backUpBallXSpeed = 0;
+  let backUpBallYSpeed = 0;
+  
+  const handlePauseEvent = () => {
+    const stopBtn = document.querySelector(".stop-btn");
+
+    const gamePausedEvent = () => {
+      if (!isGamePaused) {
+        // 게임이 진행 중인 상태에서 버튼을 터치하면 일시정지
+        backUpBallXSpeed = ballXSpeed;
+        backUpBallYSpeed = ballYSpeed;
+        ballXSpeed = 0;
+        ballYSpeed = 0;
+        isGamePaused = true;
+        isStart = false;
+      } else {
+        ballXSpeed = backUpBallXSpeed
+        ballYSpeed = backUpBallYSpeed
+        isGamePaused = false;
+        isStart = true;
+      }
+    }
+    stopBtn.addEventListener("mouseup", function () {
+      gamePausedEvent()
+    });
+    stopBtn.addEventListener("touchend", function () {
+      gamePausedEvent()
+    });
+  };
 
   const setupMoveEvent = () => {
     const moveButtons = {
@@ -225,6 +271,7 @@ const startGame = () => {
     const handleMove = (direction, isMoving) => {
       const moveFlag = `isMoving${direction}`;
       moveState[moveFlag] = isMoving;
+      isStart = true;
     };
 
     directions.forEach((direction) => {
@@ -250,6 +297,7 @@ const startGame = () => {
   const handleEvent = () => {
     handleDifficulty();
     setupMoveEvent();
+    handlePauseEvent();
   };
 
   const updateDogCoordinate = () => {
@@ -270,10 +318,10 @@ const startGame = () => {
   };
 
   const update = () => {
-    updateDogCoordinate();
-    setTimeout(updateBallCoordinates(), 400);
-    setTimeout(catMovement, 100);
     handelEndGame();
+    updateDogCoordinate();
+    updateBallCoordinates();
+    catMovement();
   };
 
   const main = async () => {
