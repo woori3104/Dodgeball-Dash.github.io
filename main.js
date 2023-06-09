@@ -47,35 +47,60 @@ const startGame = () => {
 
   let ballXSpeed = 0;
   let ballYSpeed = 0;
-  const updateBallCord = () => {
-    updateBallSpeed()
-    ballX += ballXSpeed;
-    ballY += ballYSpeed;
-  };
 
-  const updateBallSpeed = () => {
-    // 수평 이동 속도
-    ballXSpeed = 3;
-    // 수직 이동 속도
-    ballYSpeed = 3;
-  };
+  const isBallCollision = (objectX, objectY, objectSize) => {
+    const objectLeft = objectX;
+    const objectRight = objectX + objectSize;
+    const objectTop = objectY;
+    const objectBottom = objectY + objectSize;
   
-  const checkCollision = () => {
+    const ballLeft = ballX;
     const ballRight = ballX + ballSize;
+    const ballTop = ballY;
     const ballBottom = ballY + ballSize;
-    const dogRight = dogX + animalSize;
-    const dogBottom = dogY + animalSize;
-
+  
+    const distanceThreshold = 5;
     if (
-      ballX < dogRight &&
-      ballRight > dogX &&
-      ballY < dogBottom &&
-      ballBottom > dogY
+      ballLeft < objectRight - distanceThreshold &&
+      ballRight > objectLeft + distanceThreshold &&
+      ballTop < objectBottom - distanceThreshold &&
+      ballBottom > objectTop + distanceThreshold
     ) {
-      updateBallCord()
+      // 충돌 감지를 위한 계산을 최소화할 수 있도록 수정
+      return true; // 충돌 발생
+    } else {
+      return false; // 충돌 없음
     }
   };
-
+  const randomizeBallAngle = () => {
+    // 랜덤한 각도 생성 (0 이상 2π 미만)
+    const randomAngle = Math.random() * 2 * Math.PI;
+    // 반대 방향에 해당하는 각도 계산 (랜덤 각도에 π를 더해줌)
+    const oppositeAngle = randomAngle + Math.PI;
+    return { randomAngle, oppositeAngle };
+  };
+  
+  const updateBallCoordinates = () => {
+    ballX += ballXSpeed;
+    ballY += ballYSpeed;
+  
+    if (isBallCollision(dogX, dogY, animalSize)) {
+      const { randomAngle, oppositeAngle } = randomizeBallAngle();
+      const angle = Math.random() < 0.5 ? randomAngle : oppositeAngle;
+  
+      // 공의 초기 각도 설정
+      ballXSpeed = Math.cos(angle) * 5;
+      ballYSpeed = Math.sin(angle) * 5;
+    }
+  
+    if (ballX < 0 || ballX + ballSize > canvas.width) {
+      ballXSpeed = -ballXSpeed;
+    }
+    if (ballY < 0 || ballY + ballSize > canvas.height) {
+      ballYSpeed = -ballYSpeed;
+    }
+  };
+  
   const setupMoveEvent = () => {
     const moveButtons = {
       up: document.querySelector(".up-button"),
@@ -83,23 +108,22 @@ const startGame = () => {
       left: document.querySelector(".left-button"),
       right: document.querySelector(".right-button"),
     };
-  
+
     const directions = ["Up", "Down", "Left", "Right"];
-  
+
     const handleMoveStart = (direction) => () => {
       handleMove(direction, true);
     };
-  
+
     const handleMoveEnd = (direction) => () => {
       handleMove(direction, false);
     };
-  
+
     const handleMove = (direction, isMoving) => {
       const moveFlag = `isMoving${direction}`;
       moveState[moveFlag] = isMoving;
-      console.log(moveState);
     };
-  
+
     directions.forEach((direction) => {
       moveButtons[direction.toLowerCase()].addEventListener(
         "mousedown",
@@ -142,7 +166,7 @@ const startGame = () => {
 
     const gameLoop = () => {
       updateDogCoordinate();
-      checkCollision()
+      updateBallCoordinates();
       render(cat, dog, ball, background);
       requestAnimationFrame(gameLoop);
     };
