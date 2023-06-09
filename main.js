@@ -54,7 +54,6 @@ const startGame = () => {
     moveState[direction] = false;
     console.log(moveState);
   };
-
   const setupMoveEvent = () => {
     const moveButtons = {
       up: document.querySelector(".up-button"),
@@ -62,29 +61,45 @@ const startGame = () => {
       left: document.querySelector(".left-button"),
       right: document.querySelector(".right-button"),
     };
-
-    moveButtons.up.addEventListener("mousedown", () => handleMoveStart("isMovingUp"));
-    moveButtons.up.addEventListener("mouseup", () => handleMoveEnd("isMovingUp"));
-    moveButtons.up.addEventListener("touchstart", () => handleMoveStart("isMovingUp"));
-    moveButtons.up.addEventListener("touchend", () => handleMoveEnd("isMovingUp"));
-
-    moveButtons.down.addEventListener("mousedown", () => handleMoveStart("isMovingDown"));
-    moveButtons.down.addEventListener("mouseup", () => handleMoveEnd("isMovingDown"));
-    moveButtons.down.addEventListener("touchstart", () => handleMoveStart("isMovingDown"));
-    moveButtons.down.addEventListener("touchend", () => handleMoveEnd("isMovingDown"));
-
-    moveButtons.left.addEventListener("mousedown", () => handleMoveStart("isMovingLeft"));
-    moveButtons.left.addEventListener("mouseup", () => handleMoveEnd("isMovingLeft"));
-    moveButtons.left.addEventListener("touchstart", () => handleMoveStart("isMovingLeft"));
-    moveButtons.left.addEventListener("touchend", () => handleMoveEnd("isMovingLeft"));
-
-    moveButtons.right.addEventListener("mousedown", () => handleMoveStart("isMovingRight"));
-    moveButtons.right.addEventListener("mouseup", () => handleMoveEnd("isMovingRight"));
-    moveButtons.right.addEventListener("touchstart", () => handleMoveStart("isMovingRight"));
-    moveButtons.right.addEventListener("touchend", () => handleMoveEnd("isMovingRight"));
+  
+    const directions = ["Up", "Down", "Left", "Right"];
+  
+    const handleMoveStart = (direction) => () => {
+      handleMove(direction, true);
+    };
+  
+    const handleMoveEnd = (direction) => () => {
+      handleMove(direction, false);
+    };
+  
+    const handleMove = (direction, isMoving) => {
+      const moveFlag = `isMoving${direction}`;
+      moveState[moveFlag] = isMoving;
+      console.log(moveState);
+    };
+  
+    directions.forEach((direction) => {
+      moveButtons[direction.toLowerCase()].addEventListener(
+        "mousedown",
+        handleMoveStart(direction)
+      );
+      moveButtons[direction.toLowerCase()].addEventListener(
+        "mouseup",
+        handleMoveEnd(direction)
+      );
+      moveButtons[direction.toLowerCase()].addEventListener(
+        "touchstart",
+        handleMoveStart(direction)
+      );
+      moveButtons[direction.toLowerCase()].addEventListener(
+        "touchend",
+        handleMoveEnd(direction)
+      );
+    });
   };
+  
 
-  const updateDogCord = () => {
+  const updateDogCoordinate = () => {
     if (moveState.isMovingUp && dogY > 0) {
       dogY -= 5;
     }
@@ -103,10 +118,9 @@ const startGame = () => {
 
   const main = async () => {
     const { cat, dog, ball, background } = await init();
-    const { width: canvasWidth, height: canvasHeight } = canvas;
 
     const gameLoop = () => {
-      updateDogCord();
+      updateDogCoordinate();
       render(cat, dog, ball, background);
       requestAnimationFrame(gameLoop);
     };
