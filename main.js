@@ -1,4 +1,11 @@
 const startGame = () => {
+  let isStart = false;
+  let isEffectActive = false;
+  let isButtonPressed = false;
+  let isButtonReleased = false;
+  let dogScore = 0; 
+  let catScore = 0;
+  
   const canvas = document.getElementById("game-canvas");
   const ctx = canvas.getContext("2d");
 
@@ -39,10 +46,7 @@ const startGame = () => {
       25
     );
   };
-  let dogScore = 0;
-  let catScore = 0;
-  let isGameEnded = false;
-  let isStart = false;
+
 
   const handelEndGame = () => {
     if (ballX <= ballSize) {
@@ -65,14 +69,40 @@ const startGame = () => {
     animalSize = 30;
     ballYSpeed = 0;
     ballXSpeed = 0;
-    isGameEnded = false;
     isStart = false;
   };
+
+  const effectDuration = 60;
+  const effectStrength = 10; 
 
   const render = (cat, dog, ball, background) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-    ctx.drawImage(ball, ballX, ballY, ballSize, ballSize);
+    let ballDrawX = ballX;
+    let ballDrawY = ballY;
+    if (isEffectActive && (isButtonPressed || !isButtonReleased)) {
+      console.log(isEffectActive)
+      const randomAngle = Math.random() * Math.PI + Math.PI / 4;
+      const oppositeAngle = randomAngle + Math.PI;
+      const angle = Math.random() < 0.5 ? randomAngle : oppositeAngle;
+
+      // 공의 초기 각도 설정
+      ballXSpeed = Math.cos(angle) * 6;
+      ballYSpeed = Math.sin(angle) * 6;
+      // 이펙트 프레임에 따라 이동 및 크기 조절
+      const effectProgress = effectFrame / effectDuration;
+      const effectOffset = effectProgress * effectStrength;
+      ballDrawX = ballX - effectOffset / 2;
+      ballDrawY = ballY - effectOffset / 2;
+
+      ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 5;
+
+    }
+    ctx.drawImage(ball, ballDrawX, ballDrawY, ballSize, ballSize);
+
     ctx.drawImage(dog, dogX, dogY, animalSize, animalSize);
     ctx.drawImage(cat, catX, catY, animalSize, animalSize);
     drawDifficulty();
@@ -114,9 +144,12 @@ const startGame = () => {
       ballTop < objectBottom - distanceThreshold &&
       ballBottom > objectTop + distanceThreshold
     ) {
+
+      isEffectActive = true;
       // 충돌 감지를 위한 계산을 최소화할 수 있도록 수정
       return true; // 충돌 발생
     } else {
+      isEffectActive = false;
       return false; // 충돌 없음
     }
   };
@@ -142,6 +175,9 @@ const startGame = () => {
       // 공의 초기 각도 설정
       ballXSpeed = Math.cos(angle) * 5;
       ballYSpeed = Math.sin(angle) * 5;
+
+
+      effectFrame = 0;
     }
     if (isBallCollision(catX, catY, animalSize)) {
       const { randomAngle, oppositeAngle } = randomizeBallAngle();
@@ -158,16 +194,11 @@ const startGame = () => {
     if (ballY < 0 || ballY + ballSize > canvas.height) {
       ballYSpeed = -ballYSpeed;
     }
-
-    if (isGameEnded) {
-      ballXSpeed = 0;
-      ballYSpeed = 0;
-    }
   };
 
   let difficulty = 1;
   const catMovement = () => {
-    if (!isStart || isGameEnded) {
+    if (!isStart ) {
       return;
     }
     const targetX = ballX;
@@ -342,12 +373,56 @@ const startGame = () => {
     });
   };
 
+
+  const handlePowerEvent = () => {
+    const handleButtonPress = () => {
+      console.log('press')
+      isButtonPressed = true;
+      isButtonReleased = false;
+    };
+
+    const handleButtonRelease = () => {
+      console.log('release')
+      isButtonPressed = false;
+      isButtonReleased = true;
+    };
+
+    const powerBtn = document.querySelector(".power-btn");
+    powerBtn.addEventListener("mousedown", handleButtonPress);
+    powerBtn.addEventListener("touchstart", handleButtonPress);
+    powerBtn.addEventListener("mouseup", handleButtonRelease);
+    powerBtn.addEventListener("touchend", handleButtonRelease);
+  };
+
+  const effectEvent = () => {
+    if (isEffectActive) {
+      // 이펙트가 활성화되어 있을 때 프레임 증가
+      effectFrame++;
+
+      if (effectFrame >= effectDuration) {
+        // 이펙트 지속 시간이 종료되면 비활성화
+        isEffectActive = false;
+      }
+    }
+  }
+  const updateBallSpeed = () => {
+    if (isButtonPressed && !isButtonReleased) {
+      ballYSpeed += 2; // 아래쪽으로 빠르게 튀기게 하려면 값을 더 크게 조정할 수 있습니다.
+
+      // 이펙트 활성화
+      isEffectActive = true;
+      effectFrame = 0;
+    }
+  };
+
   const handleEvent = () => {
     handleDifficulty();
     setupMoveEvent();
     handlePauseEvent();
     handleResetEvent();
     handleMusicEvent();
+    handlePowerEvent();
+    effectEvent();
   };
 
   const updateDogCoordinate = () => {
@@ -369,9 +444,12 @@ const startGame = () => {
 
   const update = () => {
     handelEndGame();
-    updateDogCoordinate();
-    updateBallCoordinates();
-    catMovement();
+    if (isStart) {
+      updateDogCoordinate();
+      updateBallCoordinates();
+      catMovement();
+      updateBallSpeed();
+    }
   };
 
   const main = async () => {
